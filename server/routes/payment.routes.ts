@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { diployLogger, HTTP_STATUS, DIPLOY_BRAND } from "@diploy/core";
 import {
   getAllProviders,
@@ -38,7 +31,7 @@ import {
   completeTransaction,
   refundTransaction,
   initiatePayment,
-  verifyRazorpayPayment,
+  verifyCashfreePayment,
   verifyStripePayment,
   verifyPayPalPayment,
   verifyPaystackPayment,
@@ -94,7 +87,7 @@ export function registerPaymentsRoutes(app: Express) {
   app.post("/api/transactions/:id/complete", requireAuth, requireRole("superadmin"), completeTransaction);
   app.post("/api/transactions/:id/refund", requireAuth, requireRole("superadmin"), refundTransaction);
   app.post("/api/payment/initiate", requireAuth, initiatePayment);
-  app.post("/api/payment/verify/razorpay", requireAuth, verifyRazorpayPayment);
+  app.post("/api/payment/verify/cashfree", requireAuth, verifyCashfreePayment);
   app.post("/api/payment/verify/stripe", requireAuth, verifyStripePayment);
   app.post("/api/payment/verify/paypal", requireAuth, verifyPayPalPayment);
   app.post("/api/payment/verify/paystack", requireAuth, verifyPaystackPayment);

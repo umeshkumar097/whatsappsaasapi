@@ -1,306 +1,52 @@
-/**
- * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
- *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
- * ============================================================
- */
-
-import React, { useState } from "react";
-import { useTranslation } from "@/lib/i18n";
-import {
-  CheckCircle,
-  TrendingUp,
-  Users,
-  MessageCircle,
-  Clock,
-  Shield,
-  Target,
-  Zap,
-  AlertTriangle,
-  Star,
-} from "lucide-react";
+import React from "react";
+import { ArrowRight, CheckCircle, AlertCircle, Zap, Shield, Star } from "lucide-react";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
-import { AppSettings } from "@/types/types";
 
-type CategoryId =
-  | "messaging"
-  | "automation"
-  | "engagement"
-  | "compliance"
-  | "timing"
-  | "optimization";
+const practices = [
+  { icon: CheckCircle, color: "#25d366", title: "Always Get Opt-in Consent", body: "Never send messages to people who haven't opted in. Use click-to-chat links, QR codes, or website forms to collect consent. This keeps you compliant with Meta policy and reduces block rates.", label: "DO THIS" },
+  { icon: AlertCircle, color: "#f59e0b", title: "Don't Buy Contact Lists", body: "Purchased contact lists lead to high block rates, reduced message quality scores, and potential account suspension. Only message people who know your brand.", label: "AVOID THIS" },
+  { icon: Zap, color: "#25d366", title: "Personalize Every Message", body: "Use the recipient's first name, reference their last purchase or interaction. Personalized messages get 6x higher reply rates than generic broadcasts.", label: "PRO TIP" },
+  { icon: Shield, color: "#25d366", title: "Monitor Your Quality Score", body: "WhatsApp assigns a quality score to your number. High block rates lower it. Watch your score in the Meta Business Manager and adjust messaging frequency accordingly.", label: "IMPORTANT" },
+  { icon: Star, color: "#25d366", title: "Use Approved Templates", body: "All outbound messages must use Meta-approved templates. Write clear, value-driven templates. Avoid promotional-only language — lead with value first.", label: "MUST DO" },
+  { icon: CheckCircle, color: "#25d366", title: "Respect Opt-out Requests", body: "Immediately honor unsubscribe requests. Add a clear opt-out instruction in every campaign message (e.g. 'Reply STOP to unsubscribe'). This is both ethical and required by law.", label: "REQUIRED" },
+];
 
-interface Category {
-  id: CategoryId;
-  name: string;
-}
-
-interface PracticeItem {
-  title: string;
-  description: string;
-  tips: string[];
-  impact: string;
-}
-
-type PracticesMap = Record<CategoryId, PracticeItem[]>;
-
-interface QuickTip {
-  title: string;
-  tip: string;
-}
-
-const BestPractices = () => {
-  const { t } = useTranslation();
-  const [activeCategory, setActiveCategory] = useState<CategoryId>("messaging");
-
-  const categories = (t("bestPractices.categories", {
-    returnObjects: true,
-  }) || []) as Category[];
-
-  const practices = (t("bestPractices.practices", {
-    returnObjects: true,
-  }) || {}) as PracticesMap;
-
-  const quickTips = (t("bestPractices.quickTips.tips", {
-    returnObjects: true,
-  }) || []) as QuickTip[];
-
-  const sectionIcons: Record<
-    CategoryId,
-    React.ComponentType<{ className?: string }>
-  > = {
-    messaging: MessageCircle,
-    automation: Zap,
-    engagement: Users,
-    compliance: Shield,
-    timing: Clock,
-    optimization: TrendingUp,
-  };
-
-  const quickTipIcons: React.ComponentType<{ className?: string }>[] = [
-    Target,
-    Clock,
-    Users,
-    Shield,
-    MessageCircle,
-    TrendingUp,
-  ];
-
-  const { data: brandSettings } = useQuery<AppSettings>({
-    queryKey: ["/api/brand-settings"],
-    queryFn: () => fetch("/api/brand-settings").then((res) => res.json()),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const appName = brandSettings?.title ?? "";
-
-  const currentPractices = practices[activeCategory] || [];
-
-  return (
-    <div className="pt-16">
-      {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-green-50 via-white to-blue-50">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="bg-green-100 p-4 rounded-full w-fit mx-auto mb-6">
-            <Star className="w-8 h-8 text-green-600" />
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            {t("bestPractices.hero.title")}
-            <span className="block bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-              {t("bestPractices.hero.titleHighlight")}
-            </span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            {t("bestPractices.hero.subtitle")}
-          </p>
+const BestPractices = () => (
+  <section style={{ background: "linear-gradient(180deg, #0a2a1a 0%, #061510 100%)" }} className="min-h-screen py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(37,211,102,0.3), transparent)" }} />
+    <div className="max-w-5xl mx-auto">
+      <div className="text-center mb-16">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-6" style={{ background: "rgba(37,211,102,0.12)", border: "1px solid rgba(37,211,102,0.25)", color: "#25d366" }}>
+          Best Practices
         </div>
-      </section>
+        <h1 className="text-5xl font-black text-white mb-4">WhatsApp Marketing <span style={{ color: "#25d366" }}>Best Practices</span></h1>
+        <p className="text-lg max-w-xl mx-auto" style={{ color: "rgba(255,255,255,0.55)" }}>
+          Follow these guidelines to run compliant, high-performing WhatsApp campaigns that your customers will love.
+        </p>
+      </div>
 
-      {/* Categories */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-4">
-            {categories.map((category) => {
-              const Icon = sectionIcons[category.id] || MessageCircle;
-              return (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveCategory(category.id)}
-                  className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all ${
-                    activeCategory === category.id
-                      ? "bg-green-500 text-white shadow-lg transform scale-105"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{category.name}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Best Practices Content */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="space-y-8">
-            {currentPractices.map((practice, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition-all"
-              >
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                      {practice.title}
-                    </h3>
-                    <p className="text-gray-600 text-lg">
-                      {practice.description}
-                    </p>
-                  </div>
-                  <div className="bg-green-100 px-4 py-2 rounded-full ml-6">
-                    <span className="text-green-800 font-semibold text-sm">
-                      {practice.impact}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">
-                      {t("bestPractices.implementationTips")}
-                    </h4>
-                    <ul className="space-y-2">
-                      {practice.tips.map((tip, tipIndex) => (
-                        <li
-                          key={tipIndex}
-                          className="flex items-start space-x-3"
-                        >
-                          <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-gray-700">{tip}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl">
-                    <div className="flex items-center space-x-3 mb-4">
-                      <TrendingUp className="w-6 h-6 text-blue-600" />
-                      <h4 className="font-semibold text-gray-900">
-                        {t("bestPractices.expectedImpact")}
-                      </h4>
-                    </div>
-                    <p className="text-gray-700 mb-4">
-                      {t("bestPractices.expectedImpactDesc")}
-                    </p>
-                    <div className="bg-white p-3 rounded-lg">
-                      <span className="text-blue-600 font-bold text-lg">
-                        {practice.impact}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Quick Tips */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              {t("bestPractices.quickTips.heading")}
-            </h2>
-            <p className="text-xl text-gray-600">
-              {t("bestPractices.quickTips.subtitle")}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {quickTips.map((tip, index) => {
-              const Icon = quickTipIcons[index] || Target;
-              return (
-                <div
-                  key={index}
-                  className="bg-gray-50 p-6 rounded-xl hover:bg-gray-100 transition-colors"
-                >
-                  <div className="bg-green-100 p-3 rounded-lg w-fit mb-4">
-                    <Icon className="w-6 h-6 text-green-600" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    {tip.title}
-                  </h3>
-                  <p className="text-gray-600">{tip.tip}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Warning Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-red-50">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white p-8 rounded-2xl shadow-lg border-l-4 border-red-500">
-            <div className="flex items-start space-x-4">
-              <AlertTriangle className="w-8 h-8 text-red-500 mt-1" />
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  {t("bestPractices.warning.heading")}
-                </h3>
-                <p className="text-gray-700 mb-4">
-                  {t("bestPractices.warning.description")}
-                </p>
-                <ul className="space-y-2 text-gray-600">
-                  {(
-                    t("bestPractices.warning.points", {
-                      returnObjects: true,
-                    }) as string[]
-                  ).map((point, index) => (
-                    <li key={index}>• {point}</li>
-                  ))}
-                </ul>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-12">
+        {practices.map((p, i) => (
+          <div key={i} className="p-6 rounded-2xl transition-all hover:-translate-y-0.5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <div className="flex items-center gap-2 mb-4">
+              <p.icon className="w-5 h-5" style={{ color: p.color }} />
+              <span className="text-xs font-black uppercase tracking-widest px-2 py-0.5 rounded-md" style={{ background: `${p.color}20`, color: p.color }}>{p.label}</span>
             </div>
+            <h3 className="font-bold text-white mb-2">{p.title}</h3>
+            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>{p.body}</p>
           </div>
-        </div>
-      </section>
+        ))}
+      </div>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-green-600 to-blue-600">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            {t("bestPractices.cta.heading")}
-          </h2>
-          <p className="text-xl text-white/90 mb-8">
-            {t("bestPractices.cta.subtitle", {
-              appName,
-            })}
-          </p>
-          <Link
-            href="/contact"
-            className="bg-white text-green-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl"
-          >
-            {t("bestPractices.cta.button")}
-          </Link>
-        </div>
-      </section>
+      <div className="text-center rounded-3xl p-10" style={{ background: "rgba(37,211,102,0.06)", border: "1px solid rgba(37,211,102,0.2)" }}>
+        <h2 className="text-2xl font-black text-white mb-3">Ready to Follow Best Practices from Day 1?</h2>
+        <p className="mb-6" style={{ color: "rgba(255,255,255,0.55)" }}>Waki builds compliance into every feature — so you can focus on growing your business.</p>
+        <Link href="/signup" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all hover:-translate-y-1" style={{ background: "#25d366", color: "#fff" }}>
+          Get Started Free <ArrowRight className="w-5 h-5" />
+        </Link>
+      </div>
     </div>
-  );
-};
+  </section>
+);
 
 export default BestPractices;

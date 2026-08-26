@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import React, { useState, useEffect } from "react";
 import {
   Check,
@@ -26,7 +19,7 @@ import {
   Star,
   Building,
   AlertCircle,
-} from "lucide-react";
+CreditCard } from "lucide-react";
 import { PaymentProvider, Plan } from "@/types/types";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -36,7 +29,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { SiRazorpay, SiMercadopago } from "react-icons/si";
+import { SiMercadopago } from "react-icons/si";
 import { FaCcStripe, FaPaypal } from "react-icons/fa";
 import { apiRequest } from "@/lib/queryClient";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
@@ -92,7 +85,7 @@ interface PaymentInitiationResponse {
 
 declare global {
   interface Window {
-    Razorpay: any;
+    Cashfree: any;
   }
 }
 
@@ -260,8 +253,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const getProviderIcon = (providerKey: string) => {
     const key = providerKey.toLowerCase();
     switch (key) {
-      case "razorpay":
-        return <SiRazorpay className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" />;
+      case "cashfree":
+        return <CreditCard className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" />;
       case "stripe":
         return <FaCcStripe className="w-6 h-6 sm:w-7 sm:h-7 text-purple-600" />;
       case "paypal":
@@ -278,7 +271,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const getProviderColor = (providerKey: string) => {
     const key = providerKey.toLowerCase();
     switch (key) {
-      case "razorpay":
+      case "cashfree":
         return {
           border: "border-blue-500",
           bg: "bg-blue-50",
@@ -317,106 +310,23 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
   };
 
-  const initiateRazorpayPayment = async (
-    paymentData: PaymentInitiationData
-  ) => {
+  const initiateCashfreePayment = async (paymentData: PaymentInitiationData) => {
     try {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.async = true;
-      document.body.appendChild(script);
-
-      await new Promise((resolve, reject) => {
-        script.onload = resolve;
-        script.onerror = reject;
-      });
-
-      const options = {
-        key: paymentData.keyId,
-        subscription_id: paymentData.subscriptionId,
-        name: "WhatsApp Marketing Platform",
-        description: `${plan.name} Plan - ${isAnnual ? "Annual" : "Monthly"} Subscription`,
-        handler: async function (response: any) {
-          console.log("RAZORPAY RESPONSE =>", response);
-          try {
-            const verifyResponse = await apiRequest(
-              "POST",
-              "/api/payment/verify/razorpay",
-              {
-                transactionId: paymentData.transactionId,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_subscription_id: response.razorpay_subscription_id,
-                razorpay_signature: response.razorpay_signature,
-              }
-            );
-
-            const verifyData = await verifyResponse.json();
-
-            if (verifyData.success) {
-              toast({
-                title: "Subscription Active!",
-                description: `Welcome to ${plan.name} plan. Your subscription is now active.`,
-              });
-
-              onOpenChange(false);
-
-              setTimeout(() => {
-                window.location.reload();
-              }, 100);
-            } else {
-              throw new Error(
-                verifyData.message || "Payment verification failed"
-              );
-            }
-          } catch (error: any) {
-            toast({
-              title: "Payment Verification Failed",
-              description: error.message || "Please contact support",
-              variant: "destructive",
-            });
-
-            setTimeout(() => {
-              onOpenChange(false);
-              setLocation("/plans");
-            }, 100);
-          }
-        },
-        prefill: {
-          email: "test@gmail.com",
-          name: "test",
-        },
-        theme: {
-          color: "#3b82f6",
-        },
-        modal: {
-          ondismiss: function () {
-            console.log("CHECKOUT CLOSED");
-            setLoading(false);
-            toast({
-              title: "Payment Cancelled",
-              description: "You cancelled the payment process",
-              variant: "destructive",
-            });
-          },
-          escape: true,
-          backdropclose: false,
-        },
-      };
-
-
-      console.log("RAZORPAY OPTIONS =>", options);
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
+      if (paymentData.shortUrl) {
+        window.location.href = paymentData.shortUrl;
+      } else {
+        throw new Error("Missing checkout URL from Cashfree");
+      }
     } catch (error: any) {
       setLoading(false);
       toast({
         title: "Payment Failed",
-        description: "Failed to initialize payment. Please try again.",
+        description: error.message || "Failed to initialize payment",
         variant: "destructive",
       });
     }
   };
+
 
   const handlePayment = async () => {
     if (!selectedProvider) {
@@ -476,9 +386,9 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         setPaymentStep("pay");
         onOpenChange(true);
         setLoading(false);
-      } else if (provider === "razorpay") {
+      } else if (provider === "cashfree") {
         onOpenChange(false);
-        await initiateRazorpayPayment(data.data);
+        await initiateCashfreePayment(data.data);
         setLoading(false);
       } else if (provider === "paypal") {
         if (!data.data.approvalUrl) {

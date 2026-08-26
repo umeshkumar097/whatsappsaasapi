@@ -1,285 +1,69 @@
-/**
- * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
- *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
- * ============================================================
- */
+import React from "react";
+import { ArrowRight, BookOpen, CheckCircle, MessageCircle, Send, Bot, BarChart3, Users } from "lucide-react";
+import { Link } from "wouter";
 
-import React, { useState } from "react";
-import { useTranslation } from "@/lib/i18n";
-import {
-  BookOpen,
-  ArrowRight,
-  MessageCircle,
-  Settings,
-  Users,
-  BarChart3,
-  Zap,
-  Shield,
-  Globe,
-} from "lucide-react";
+const tips = [
+  { icon: MessageCircle, title: "Use Rich Media", description: "Messages with images, videos or PDFs get 3x higher engagement than plain text. Always use your brand visuals." },
+  { icon: Users, title: "Segment Your Audience", description: "Don't blast everyone. Segment contacts by location, purchase history or behavior for targeted, relevant messages." },
+  { icon: Send, title: "Timing is Everything", description: "Send between 10 AM–12 PM or 6 PM–8 PM IST for highest open rates. Avoid Mondays and late nights." },
+  { icon: Bot, title: "Automate Follow-ups", description: "Set up automated sequences. If someone doesn't reply in 24 hours, send a follow-up with a different angle." },
+  { icon: BarChart3, title: "Track & Optimize", description: "Monitor delivery rate, open rate and reply rate. A/B test your messages to find what works best for your audience." },
+  { icon: CheckCircle, title: "Get Opt-in Consent", description: "Always get explicit consent before messaging. Use opt-in forms, QR codes or WhatsApp click-to-chat links." },
+];
 
-// Define types for better type safety
-interface Section {
-  id: string;
-  title: string;
-}
-
-interface QuickTip {
-  title: string;
-  tip: string;
-}
-
-interface ContentItem {
-  title: string;
-  text: string;
-}
-
-interface SectionContent {
-  title: string;
-  items: ContentItem[];
-}
-
-const WhatsAppGuide = () => {
-  const { t } = useTranslation();
-  const [activeSection, setActiveSection] = useState("getting-started");
-
-  // Get translated data with proper type assertions
-  const sections = (t("whatsappGuide.sections", {
-    returnObjects: true,
-  }) || []) as Section[];
-
-  const quickTips = (t("whatsappGuide.quickTips.tips", {
-    returnObjects: true,
-  }) || []) as QuickTip[];
-
-  // Icon mapping for sections
-  const sectionIcons: Record<
-    string,
-    React.ComponentType<{ className?: string }>
-  > = {
-    "getting-started": Zap,
-    setup: Settings,
-    campaigns: MessageCircle,
-    automation: BarChart3,
-    "best-practices": Shield,
-    compliance: Globe,
-  };
-
-  // Icon mapping for quick tips
-  const tipIcons: React.ComponentType<{ className?: string }>[] = [
-    Users,
-    MessageCircle,
-    BarChart3,
-    Zap,
-    Shield,
-    Globe,
-  ];
-
-  // Get current section content with proper typing
-  const getCurrentContent = (): SectionContent => {
-    const content = t(`whatsappGuide.content.${activeSection}`, {
-      returnObjects: true,
-    });
-
-    // Default fallback structure
-    const defaultContent: SectionContent = {
-      title: "Loading...",
-      items: [],
-    };
-
-    if (!content || typeof content !== "object") {
-      return defaultContent;
-    }
-
-    return content as SectionContent;
-  };
-
-  const currentContent = getCurrentContent();
-
-  return (
-    <div className="pt-16">
-      {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-green-50 via-white to-blue-50">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="bg-green-100 p-4 rounded-full w-fit mx-auto mb-6">
-            <BookOpen className="w-8 h-8 text-green-600" />
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            {t("whatsappGuide.hero.title")}
-            <span className="block bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-              {t("whatsappGuide.hero.titleHighlight")}
-            </span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            {t("whatsappGuide.hero.subtitle")}
-          </p>
+const WhatsAppGuide = () => (
+  <section style={{ background: "linear-gradient(180deg, #0a2a1a 0%, #061510 100%)" }} className="min-h-screen py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(37,211,102,0.3), transparent)" }} />
+    <div className="max-w-5xl mx-auto">
+      <div className="text-center mb-16">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-6" style={{ background: "rgba(37,211,102,0.12)", border: "1px solid rgba(37,211,102,0.25)", color: "#25d366" }}>
+          WhatsApp Marketing Guide
         </div>
-      </section>
+        <h1 className="text-5xl font-black text-white mb-4">The Complete Guide to <span style={{ color: "#25d366" }}>WhatsApp Marketing</span></h1>
+        <p className="text-lg max-w-xl mx-auto" style={{ color: "rgba(255,255,255,0.55)" }}>
+          Everything you need to know to run successful WhatsApp campaigns for your business.
+        </p>
+      </div>
 
-      {/* Guide Content */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Sidebar Navigation */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-24 bg-gray-50 rounded-xl p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">
-                  {t("whatsappGuide.sidebarTitle")}
-                </h3>
-                <nav className="space-y-2">
-                  {sections.map((section) => {
-                    const Icon = sectionIcons[section.id] || Zap;
-                    return (
-                      <button
-                        key={section.id}
-                        onClick={() => setActiveSection(section.id)}
-                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all ${
-                          activeSection === section.id
-                            ? "bg-green-500 text-white shadow-lg"
-                            : "text-gray-700 hover:bg-white hover:shadow-md"
-                        }`}
-                      >
-                        <Icon className="w-5 h-5" />
-                        <span className="font-medium">{section.title}</span>
-                      </button>
-                    );
-                  })}
-                </nav>
-              </div>
+      {/* Intro card */}
+      <div className="rounded-2xl p-8 mb-8" style={{ background: "rgba(37,211,102,0.06)", border: "1px solid rgba(37,211,102,0.2)" }}>
+        <BookOpen className="w-8 h-8 mb-4" style={{ color: "#25d366" }} />
+        <h2 className="text-2xl font-black text-white mb-3">Why WhatsApp Marketing?</h2>
+        <p className="leading-relaxed mb-4" style={{ color: "rgba(255,255,255,0.65)" }}>
+          WhatsApp has 500 million+ users in India alone with a 98% message open rate — compared to just 20% for email. It's the most direct, personal channel to reach your customers. With the official Meta Business API, you can send bulk messages, automate conversations, and track results — all while staying compliant.
+        </p>
+        <div className="grid grid-cols-3 gap-4">
+          {[["98%", "Open Rate"], ["500M+", "Indian Users"], ["5x", "vs Email ROI"]].map(([v, l], i) => (
+            <div key={i} className="text-center p-4 rounded-xl" style={{ background: "rgba(0,0,0,0.2)" }}>
+              <div className="text-2xl font-black text-white">{v}</div>
+              <div className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.5)" }}>{l}</div>
             </div>
+          ))}
+        </div>
+      </div>
 
-            {/* Main Content */}
-            <div className="lg:col-span-3">
-              <div className="bg-white">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8">
-                  {currentContent.title}
-                </h2>
-
-                <div className="space-y-8">
-                  {currentContent.items && currentContent.items.length > 0 ? (
-                    currentContent.items.map((item, index) => (
-                      <div
-                        key={index}
-                        className="border-l-4 border-green-500 pl-6"
-                      >
-                        <h3 className="text-xl font-bold text-gray-900 mb-3">
-                          {item.title}
-                        </h3>
-                        <p className="text-gray-600 leading-relaxed">
-                          {item.text}
-                        </p>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500">No content available</p>
-                  )}
-                </div>
-
-                {/* Navigation */}
-                <div className="flex justify-between items-center mt-12 pt-8 border-t border-gray-200">
-                  <button
-                    onClick={() => {
-                      const currentIndex = sections.findIndex(
-                        (s) => s.id === activeSection
-                      );
-                      if (currentIndex > 0) {
-                        setActiveSection(sections[currentIndex - 1].id);
-                      }
-                    }}
-                    disabled={
-                      sections.findIndex((s) => s.id === activeSection) === 0
-                    }
-                    className="flex items-center space-x-2 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    <span>{t("whatsappGuide.navigation.previous")}</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      const currentIndex = sections.findIndex(
-                        (s) => s.id === activeSection
-                      );
-                      if (currentIndex < sections.length - 1) {
-                        setActiveSection(sections[currentIndex + 1].id);
-                      }
-                    }}
-                    disabled={
-                      sections.findIndex((s) => s.id === activeSection) ===
-                      sections.length - 1
-                    }
-                    className="flex items-center space-x-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    <span>{t("whatsappGuide.navigation.next")}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+      {/* Tips grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-12">
+        {tips.map((tip, i) => (
+          <div key={i} className="p-6 rounded-2xl transition-all hover:-translate-y-0.5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style={{ background: "rgba(37,211,102,0.12)" }}>
+              <tip.icon className="w-5 h-5" style={{ color: "#25d366" }} />
             </div>
+            <h3 className="font-bold text-white mb-2">{tip.title}</h3>
+            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>{tip.description}</p>
           </div>
-        </div>
-      </section>
+        ))}
+      </div>
 
-      {/* Quick Tips */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              {t("whatsappGuide.quickTips.heading")}
-            </h2>
-            <p className="text-xl text-gray-600">
-              {t("whatsappGuide.quickTips.subtitle")}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {quickTips.map((tip, index) => {
-              const Icon = tipIcons[index] || Users;
-              return (
-                <div
-                  key={index}
-                  className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
-                >
-                  <div className="bg-green-100 p-3 rounded-lg w-fit mb-4">
-                    <Icon className="w-6 h-6 text-green-600" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    {tip.title}
-                  </h3>
-                  <p className="text-gray-600">{tip.tip}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-green-600 to-blue-600">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            {t("whatsappGuide.cta.heading")}
-          </h2>
-          <p className="text-xl text-white/90 mb-8">
-            {t("whatsappGuide.cta.subtitle")}
-          </p>
-          <button className="bg-white text-green-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl">
-            {t("whatsappGuide.cta.button")}
-          </button>
-        </div>
-      </section>
+      <div className="text-center rounded-3xl p-10" style={{ background: "rgba(37,211,102,0.06)", border: "1px solid rgba(37,211,102,0.2)" }}>
+        <h2 className="text-2xl font-black text-white mb-3">Start Your First Campaign Today</h2>
+        <p className="mb-6" style={{ color: "rgba(255,255,255,0.55)" }}>Apply everything you've learned — free plan available, no credit card required.</p>
+        <Link href="/signup" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all hover:-translate-y-1" style={{ background: "#25d366", color: "#fff" }}>
+          Get Started Free <ArrowRight className="w-5 h-5" />
+        </Link>
+      </div>
     </div>
-  );
-};
+  </section>
+);
 
 export default WhatsAppGuide;

@@ -2133,7 +2133,7 @@
     "form": {
       "providerLabel": "مزود الدفع *",
       "selectProvider": "اختر المزود",
-      "razorpay": "Razorpay",
+      "cashfree": "Cashfree",
       "stripe": "Stripe",
       "environmentLabel": "وضع البيئة *",
       "testMode": "وضع الاختبار",
@@ -2143,12 +2143,12 @@
       "testCredentials": "بيانات الاختبار",
       "liveCredentials": "البيانات المباشرة",
       "testApiKey": "مفتاح API للاختبار *",
-      "testApiKeyPlaceholderRazorpay": "rzp_test_xxxxxxxxxxxxx",
+      "testApiKeyPlaceholderCashfree": "rzp_test_xxxxxxxxxxxxx",
       "testApiKeyPlaceholderStripe": "pk_test_xxxxxxxxxxxxx",
       "testApiSecret": "سر API للاختبار *",
       "testApiSecretPlaceholder": "أدخل المفتاح السري للاختبار",
       "liveApiKey": "مفتاح API المباشر *",
-      "liveApiKeyPlaceholderRazorpay": "rzp_live_xxxxxxxxxxxxx",
+      "liveApiKeyPlaceholderCashfree": "rzp_live_xxxxxxxxxxxxx",
       "liveApiKeyPlaceholderStripe": "pk_live_xxxxxxxxxxxxx",
       "liveApiSecret": "سر API المباشر *",
       "liveApiSecretPlaceholder": "أدخل المفتاح السري المباشر",
@@ -2158,12 +2158,12 @@
       "updateSettings": "تحديث الإعدادات",
       "saveSettings": "حفظ الإعدادات"
     },
-    "razorpay": {
-      "title": "تكوين Razorpay",
-      "description": "احصل على بيانات Razorpay من لوحة تحكم Razorpay. ستحتاج إلى بيانات الاختبار والمباشرة.",
+    "cashfree": {
+      "title": "تكوين Cashfree",
+      "description": "احصل على بيانات Cashfree من لوحة تحكم Cashfree. ستحتاج إلى بيانات الاختبار والمباشرة.",
       "testKeyInfo": "مفاتيح الاختبار تبدأ بـ",
       "liveKeyInfo": "المفاتيح المباشرة تبدأ بـ",
-      "getKeys": "احصل على مفاتيح Razorpay API ←"
+      "getKeys": "احصل على مفاتيح Cashfree API ←"
     },
     "stripe": {
       "title": "تكوين Stripe",

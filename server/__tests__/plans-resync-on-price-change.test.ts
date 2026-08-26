@@ -59,7 +59,7 @@ const syncPlanToAllGatewaysMock = vi.fn(async (_planId: string) => ({
 vi.mock("../services/payment-gateway.service", () => ({
   syncPlanToAllGateways: syncPlanToAllGatewaysMock,
   syncPlanToStripe: vi.fn(),
-  syncPlanToRazorpay: vi.fn(),
+  syncPlanToCashfree: vi.fn(),
 }));
 
 vi.mock("../services/cache", () => ({

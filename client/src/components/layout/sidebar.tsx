@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { MdOutlinePayment } from "react-icons/md";
@@ -42,6 +35,7 @@ import {
     Code,
     BookOpen,
     Smartphone,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ChannelSwitcher } from "@/components/channel-switcher";
@@ -93,6 +87,13 @@ function getNavItems(role: string): NavItem[] {
                 alwaysVisible: true,
                 allowedRoles: ["superadmin", "admin", "user", "team"],
             },
+            {
+                href: "/wallet",
+                icon: Wallet,
+                labelKey: "Wallet",
+                color: "text-emerald-500",
+                allowedRoles: ["superadmin", "admin", "user", "team"],
+            },,
             {
                 href: "/inbox",
                 icon: MessageSquare,
@@ -208,6 +209,13 @@ function getNavItems(role: string): NavItem[] {
                 alwaysVisible: true,
                 allowedRoles: ["superadmin", "admin", "user", "team"],
             },
+            {
+                href: "/wallet",
+                icon: Wallet,
+                labelKey: "Wallet",
+                color: "text-emerald-500",
+                allowedRoles: ["superadmin", "admin", "user", "team"],
+            },,
             {
                 href: "/inbox",
                 icon: MessageSquare,
@@ -357,6 +365,12 @@ const sidebarItemsCategories = [
         icon: Bell,
         path: "/notifications",
         color: "text-pink-400",
+    },
+    {
+        name: "Wallet & Rates",
+        icon: Wallet,
+        path: "/wallet-management",
+        color: "text-emerald-500",
     },
     {
         name: "navigation.subscription_plans",

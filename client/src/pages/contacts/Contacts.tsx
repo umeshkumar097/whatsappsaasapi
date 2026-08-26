@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/components/layout/header";
@@ -51,6 +44,7 @@ import { ContactsToolbar } from "./ContactsToolbar";
 import { ContactsTable } from "./ContactsTable";
 import { ContactDialogs } from "./ContactDialogs";
 import { TemplateMessageDialog } from "./TemplateMessageDialog";
+import { FieldMappingDialog, type RawRow, type FieldMapping } from "./FieldMappingDialog";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -122,6 +116,12 @@ export default function Contacts() {
     noPhoneCount: number;
     invalidFormatCount: number;
     validCount: number;
+  } | null>(null);
+
+  // Field mapping state — shown after CSV/Excel upload
+  const [mappingData, setMappingData] = useState<{
+    headers: string[];
+    rawRows: RawRow[];
   } | null>(null);
 
   useEffect(() => {
@@ -651,6 +651,43 @@ export default function Contacts() {
   };
 
 
+  // Apply field mapping to raw rows and import
+  const handleConfirmMapping = (fieldMapping: FieldMapping) => {
+    if (!mappingData) return;
+    setMappingData(null);
+
+    const parsedContacts: LocalInsertContact[] = mappingData.rawRows
+      .map((row) => ({
+        name: fieldMapping.name ? row[fieldMapping.name]?.toString().trim() || "" : "",
+        phone: fieldMapping.phone ? String(row[fieldMapping.phone] || "").trim() : "",
+        email: fieldMapping.email ? row[fieldMapping.email]?.toString().trim() || "" : "",
+        groups: fieldMapping.groups && row[fieldMapping.groups]
+          ? row[fieldMapping.groups].split(",").map((g) => g.trim()).filter(Boolean)
+          : [],
+        tags: fieldMapping.tags && row[fieldMapping.tags]
+          ? row[fieldMapping.tags].split(",").map((t) => t.trim()).filter(Boolean)
+          : [],
+      }))
+      .filter((c) => c.phone);
+
+    if (parsedContacts.length === 0) {
+      toast({
+        title: "No Valid Contacts",
+        description: "No contacts with valid phone numbers found after mapping.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const noPhone = parsedContacts.filter((c) => !c.phone).length;
+    const invalidFormat = parsedContacts.filter((c) => c.phone && !isValidPhone(c.phone)).length;
+    if (noPhone > 0 || invalidFormat > 0) {
+      setPendingImport({ contacts: parsedContacts, noPhoneCount: noPhone, invalidFormatCount: invalidFormat, validCount: parsedContacts.length });
+    } else {
+      uploadContactsInChunks(parsedContacts);
+    }
+  };
+
   const handleCSVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -668,48 +705,25 @@ export default function Contacts() {
         const sample = results.errors.slice(0, 3).map((e) => e.message).join("; ");
         toast({
           title: "CSV Parse Warnings",
-          description: `${results.errors.length} row(s) had parse issues and may be skipped. First issue: ${sample}`,
+          description: `${results.errors.length} row(s) had parse issues. First issue: ${sample}`,
           variant: "default",
         });
       }
 
-      const parsedContacts: LocalInsertContact[] = (results.data as any[])
-        .filter((row) => row && Object.keys(row).length > 0)
-        .map((row: any) => ({
-          name: row?.name?.toString().trim() || "",
-          phone: row?.phone ? String(row.phone).trim() : "",
-          email: row?.email?.toString().trim() || "",
-          groups: row?.groups
-            ? row.groups.split(",").map((g: string) => g.trim())
-            : [],
-          tags: row?.tags
-            ? row.tags.split(",").map((t: string) => t.trim())
-            : [],
-        }))
-        .filter((c) => c.name || c.phone);
+      const rawRows = (results.data as RawRow[]).filter(
+        (row) => row && Object.keys(row).length > 0
+      );
 
-      if (parsedContacts.length === 0) {
-        toast({
-          title: "CSV Error",
-          description: "No valid contacts found in the file.",
-          variant: "destructive",
-        });
+      if (rawRows.length === 0) {
+        toast({ title: "CSV Error", description: "No data rows found in the file.", variant: "destructive" });
         return;
       }
 
-      const noPhone = parsedContacts.filter((c) => !c.phone).length;
-      const invalidFormat = parsedContacts.filter((c) => c.phone && !isValidPhone(c.phone)).length;
-      if (noPhone > 0 || invalidFormat > 0) {
-        setPendingImport({ contacts: parsedContacts, noPhoneCount: noPhone, invalidFormatCount: invalidFormat, validCount: parsedContacts.length });
-      } else {
-        uploadContactsInChunks(parsedContacts);
-      }
+      const headers = results.meta.fields || Object.keys(rawRows[0] || {});
+      // Always show mapping dialog
+      setMappingData({ headers, rawRows });
     } catch (err: any) {
-      toast({
-        title: "CSV Parse Error",
-        description: err.message || "Failed to parse CSV file.",
-        variant: "destructive",
-      });
+      toast({ title: "CSV Parse Error", description: err.message || "Failed to parse CSV file.", variant: "destructive" });
     }
   };
 
@@ -726,74 +740,54 @@ export default function Contacts() {
 
       const worksheet = workbook.worksheets[0];
       if (!worksheet) {
-        alert("No worksheet found in Excel file.");
+        toast({ title: "Excel Error", description: "No worksheet found in the Excel file.", variant: "destructive" });
         return;
       }
-
-      const rows: Record<string, string>[] = [];
 
       const headerRow = worksheet.getRow(1);
       if (!headerRow || !headerRow.values) {
-        alert("No header row found in Excel file.");
+        toast({ title: "Excel Error", description: "No header row found in the Excel file.", variant: "destructive" });
         return;
       }
 
-      const headerValues = Array.isArray(headerRow.values)
+      // Keep original casing for headers (display to user as-is)
+      const originalHeaders: string[] = Array.isArray(headerRow.values)
         ? headerRow.values
             .slice(1)
             .map((h: ExcelJS.CellValue | undefined) =>
-              typeof h === "string"
-                ? h.trim().toLowerCase()
-                : typeof h === "number"
-                ? String(h)
-                : ""
+              typeof h === "string" ? h.trim() : typeof h === "number" ? String(h) : ""
             )
+            .filter(Boolean)
         : [];
 
+      const rawRows: RawRow[] = [];
       worksheet.eachRow((row, rowNumber) => {
         if (rowNumber === 1) return;
-
-        const rowData: Record<string, string> = {};
+        const rowData: RawRow = {};
         if (row.values && Array.isArray(row.values)) {
-          row.values
-            .slice(1)
-            .forEach((cell: ExcelJS.CellValue | undefined, idx: number) => {
-              const key = headerValues[idx];
-              if (key) {
-                if (typeof cell === "string") rowData[key] = cell.trim();
-                else if (typeof cell === "number") rowData[key] = String(cell);
-                else rowData[key] = "";
-              }
-            });
+          row.values.slice(1).forEach((cell: ExcelJS.CellValue | undefined, idx: number) => {
+            const key = originalHeaders[idx];
+            if (key) {
+              if (typeof cell === "string") rowData[key] = cell.trim();
+              else if (typeof cell === "number") rowData[key] = String(cell);
+              else if (cell && typeof cell === "object" && "text" in (cell as any)) rowData[key] = String((cell as any).text);
+              else rowData[key] = "";
+            }
+          });
         }
-
-        rows.push(rowData);
+        if (Object.values(rowData).some((v) => v)) rawRows.push(rowData);
       });
 
-      const parsedContacts: LocalInsertContact[] = rows.map((row) => ({
-        name: row["name"] || "",
-        phone: row["phone"] || "",
-        email: row["email"] || "",
-        groups: row["groups"]
-          ? row["groups"].split(",").map((g) => g.trim())
-          : [],
-        tags: row["tags"] ? row["tags"].split(",").map((t) => t.trim()) : [],
-      }));
-
-      const noPhone = parsedContacts.filter((c) => !c.phone).length;
-      const invalidFormat = parsedContacts.filter((c) => c.phone && !isValidPhone(c.phone)).length;
-      if (noPhone > 0 || invalidFormat > 0) {
-        setPendingImport({ contacts: parsedContacts, noPhoneCount: noPhone, invalidFormatCount: invalidFormat, validCount: parsedContacts.length });
-      } else {
-        await uploadContactsInChunks(parsedContacts);
+      if (rawRows.length === 0) {
+        toast({ title: "Excel Error", description: "No data rows found in the file.", variant: "destructive" });
+        return;
       }
+
+      // Show field mapping dialog
+      setMappingData({ headers: originalHeaders, rawRows });
     } catch (error) {
       console.error("Error reading Excel file:", error);
-      toast({
-        title: "Excel Error",
-        description: "Failed to read Excel file. Please check the format.",
-        variant: "destructive",
-      });
+      toast({ title: "Excel Error", description: "Failed to read Excel file. Please check the format.", variant: "destructive" });
     }
 
     event.target.value = "";
@@ -1025,6 +1019,16 @@ export default function Contacts() {
         user={user}
         headerType={headerType}
         setHeaderType={setHeaderType}
+      />
+
+      {/* Field Mapping Dialog — shown after CSV/Excel upload */}
+      <FieldMappingDialog
+        open={!!mappingData}
+        csvHeaders={mappingData?.headers || []}
+        previewRows={mappingData?.rawRows || []}
+        totalRows={mappingData?.rawRows.length || 0}
+        onConfirm={handleConfirmMapping}
+        onCancel={() => setMappingData(null)}
       />
 
       <AlertDialog

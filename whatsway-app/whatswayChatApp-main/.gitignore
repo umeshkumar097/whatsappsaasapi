@@ -1,0 +1,14 @@
+Paste all the ignore rules into that file, one per line:
+build/
+.dart_tool/
+.flutter-plugin-dependencies
+.packages
+*.iml
+.idea/
+android/.gradle/
+android/app/build/
+ios/Flutter/Flutter.framework
+ios/Pods/
+.DS_Store
+*.g.dart
+*.freezed.dart

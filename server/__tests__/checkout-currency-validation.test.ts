@@ -58,16 +58,16 @@ vi.mock("../services/public-origin", () => ({
   resolvePublicOrigin: vi.fn(async () => "https://app.example.test"),
 }));
 
-const razorpaySubsCreate = vi.fn(async () => ({ id: "sub_123", short_url: "https://rzp.io/x", status: "created" }));
-const razorpaySubsCancel = vi.fn(async () => ({}));
-const razorpayCustomersCreate = vi.fn(async () => ({ id: "cust_1" }));
+const cashfreeSubsCreate = vi.fn(async () => ({ id: "sub_123", short_url: "https://rzp.io/x", status: "created" }));
+const cashfreeSubsCancel = vi.fn(async () => ({}));
+const cashfreeCustomersCreate = vi.fn(async () => ({ id: "cust_1" }));
 
-vi.mock("razorpay", () => {
-  function Razorpay(this: any) {
-    this.subscriptions = { create: razorpaySubsCreate, cancel: razorpaySubsCancel };
-    this.customers = { create: razorpayCustomersCreate };
+vi.mock("cashfree", () => {
+  function Cashfree(this: any) {
+    this.subscriptions = { create: cashfreeSubsCreate, cancel: cashfreeSubsCancel };
+    this.customers = { create: cashfreeCustomersCreate };
   }
-  return { default: Razorpay };
+  return { default: Cashfree };
 });
 
 const stripeSubsCreate = vi.fn(async () => ({
@@ -105,7 +105,7 @@ beforeEach(() => {
   lastFromTable = null;
   lastValues = null;
   svc.resetGatewayInstances();
-  razorpaySubsCreate.mockClear();
+  cashfreeSubsCreate.mockClear();
   stripeSubsCreate.mockClear();
   stripeCheckoutSessionsCreate.mockClear();
   stripeSubsCancel.mockClear();
@@ -113,31 +113,31 @@ beforeEach(() => {
 });
 
 describe("checkout currency validation", () => {
-  it("createRazorpaySubscription throws CurrencyNotSupportedError on USD when only INR is supported and inserts no subscription row", async () => {
+  it("createCashfreeSubscription throws CurrencyNotSupportedError on USD when only INR is supported and inserts no subscription row", async () => {
     queryQueue.push(
-      [{ providerKey: "razorpay", isActive: true, supportedCurrencies: ["INR"], config: { isLive: false, apiKeyTest: "k", apiSecretTest: "s" }, name: "Razorpay" }],
-      [{ providerKey: "razorpay", isActive: true, supportedCurrencies: ["INR"], name: "Razorpay" }],
+      [{ providerKey: "cashfree", isActive: true, supportedCurrencies: ["INR"], config: { isLive: false, apiKeyTest: "k", apiSecretTest: "s" }, name: "Cashfree" }],
+      [{ providerKey: "cashfree", isActive: true, supportedCurrencies: ["INR"], name: "Cashfree" }],
     );
 
     await expect(
-      svc.createRazorpaySubscription("u1", "p1", "monthly", "USD"),
+      svc.createCashfreeSubscription("u1", "p1", "monthly", "USD"),
     ).rejects.toBeInstanceOf(svc.CurrencyNotSupportedError);
 
-    expect(razorpaySubsCreate).not.toHaveBeenCalled();
+    expect(cashfreeSubsCreate).not.toHaveBeenCalled();
     expect(dbMock.insert).not.toHaveBeenCalled();
   });
 
-  it("createRazorpaySubscription proceeds when the requested currency is supported", async () => {
+  it("createCashfreeSubscription proceeds when the requested currency is supported", async () => {
     queryQueue.push(
-      [{ providerKey: "razorpay", isActive: true, supportedCurrencies: ["INR"], config: { isLive: false, apiKeyTest: "k", apiSecretTest: "s" }, name: "Razorpay" }],
-      [{ providerKey: "razorpay", isActive: true, supportedCurrencies: ["INR"], name: "Razorpay" }],
-      [{ id: "p1", name: "Pro", razorpayPlanIdMonthly: "rzp_plan_1", monthlyPrice: "1000.00", annualPrice: "10000.00" }],
+      [{ providerKey: "cashfree", isActive: true, supportedCurrencies: ["INR"], config: { isLive: false, apiKeyTest: "k", apiSecretTest: "s" }, name: "Cashfree" }],
+      [{ providerKey: "cashfree", isActive: true, supportedCurrencies: ["INR"], name: "Cashfree" }],
+      [{ id: "p1", name: "Pro", cashfreePlanIdMonthly: "rzp_plan_1", monthlyPrice: "1000.00", annualPrice: "10000.00" }],
       [],
     );
 
-    const result = await svc.createRazorpaySubscription("u1", "p1", "monthly", "INR");
+    const result = await svc.createCashfreeSubscription("u1", "p1", "monthly", "INR");
 
-    expect(razorpaySubsCreate).toHaveBeenCalledTimes(1);
+    expect(cashfreeSubsCreate).toHaveBeenCalledTimes(1);
     expect(result).toMatchObject({ subscriptionId: "sub_123" });
   });
 
@@ -172,14 +172,14 @@ describe("checkout currency validation", () => {
     expect(stripeSubsCreate).not.toHaveBeenCalled();
   });
 
-  it("createRazorpaySubscription throws unconfigured error when supportedCurrencies is empty", async () => {
+  it("createCashfreeSubscription throws unconfigured error when supportedCurrencies is empty", async () => {
     queryQueue.push(
-      [{ providerKey: "razorpay", isActive: true, supportedCurrencies: [], config: { isLive: false, apiKeyTest: "k", apiSecretTest: "s" }, name: "Razorpay" }],
-      [{ providerKey: "razorpay", isActive: true, supportedCurrencies: [], name: "Razorpay" }],
+      [{ providerKey: "cashfree", isActive: true, supportedCurrencies: [], config: { isLive: false, apiKeyTest: "k", apiSecretTest: "s" }, name: "Cashfree" }],
+      [{ providerKey: "cashfree", isActive: true, supportedCurrencies: [], name: "Cashfree" }],
     );
 
     await expect(
-      svc.createRazorpaySubscription("u1", "p1", "monthly", "INR"),
+      svc.createCashfreeSubscription("u1", "p1", "monthly", "INR"),
     ).rejects.toMatchObject({ name: "CurrencyNotSupportedError", reason: "unconfigured" });
   });
 });
@@ -197,11 +197,11 @@ describe("checkout controller maps currency error to 400", () => {
   it("returns 400 with the CurrencyNotSupportedError message when the helper rejects", async () => {
     const provider = {
       id: "prov1",
-      providerKey: "razorpay",
+      providerKey: "cashfree",
       isActive: true,
       supportedCurrencies: ["INR"],
       config: { isLive: false, apiKeyTest: "k", apiSecretTest: "s" },
-      name: "Razorpay",
+      name: "Cashfree",
     };
     queryQueue.push(
       [{ id: "p1", name: "Pro", monthlyPrice: "1000.00", annualPrice: "10000.00" }],

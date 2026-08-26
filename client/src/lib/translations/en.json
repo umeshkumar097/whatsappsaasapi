@@ -997,19 +997,19 @@
             ]
         },
         "heroSec": {
-            "animatedBgGreenText": "Free WhatsApp Marketing Platform - Bring Your Own API",
+            "animatedBgGreenText": "Free WhatsApp Marketing Platform — Bring Your Own API",
             "headline": "Scale Your Business with",
             "highlightText": "WhatsApp Marketing",
-            "subHeadline": "Connect your Meta WhatsApp Business API and unlock powerful automation, bulk messaging, and advanced analytics. Start free, scale unlimited.",
-            "startTrialButton": "Start Free Trial",
-            "watchDemoButton": "Watch 2-min Demo",
+            "subHeadline": "Connect your Meta WhatsApp Business API and unlock powerful automation, bulk messaging, and advanced analytics — powered by Aiclex Technologies. Start free, scale unlimited.",
+            "startTrialButton": "Get Started Free",
+            "watchDemoButton": "Watch Demo",
             "trustedByText": "Trusted by 10,000+ businesses worldwide",
             "brands": [
-                "Shopify",
-                "WooCommerce",
-                "Salesforce",
-                "HubSpot",
-                "Zapier"
+                "E-commerce",
+                "Real Estate",
+                "Healthcare",
+                "Education",
+                "Restaurants"
             ],
             "stats": [
                 {
@@ -1188,8 +1188,8 @@
             },
             "cta": {
                 "readyToGetStarted": "Ready to Get Started?",
-                "joinText": "Join thousands of businesses already using our platform to scale their WhatsApp marketing",
-                "startFreeTrial": "Start Your Free Trial"
+                "joinText": "Join thousands of businesses across India already using Aiclex Technologies to scale their WhatsApp marketing",
+                "startFreeTrial": "Get Started Free"
             }
         },
         "useCasesSec": {
@@ -1518,7 +1518,7 @@
                     "",
                     ""
                 ],
-                "description": "The most powerful WhatsApp marketing platform. Scale your business with automated campaigns, advanced analytics, and seamless API integration."
+                "description": "Aiclex Technologies — India's AI-first product studio. Power your business with WhatsApp automation, bulk messaging, advanced analytics, and AI-driven customer engagement."
             },
             "socialLinks": {
                 "twitter": "Twitter",
@@ -2098,7 +2098,7 @@
         "form": {
             "providerLabel": "Payment Provider *",
             "selectProvider": "Select provider",
-            "razorpay": "Razorpay",
+            "cashfree": "Cashfree",
             "stripe": "Stripe",
             "environmentLabel": "Environment Mode *",
             "testMode": "Test Mode",
@@ -2108,12 +2108,12 @@
             "testCredentials": "Test Credentials",
             "liveCredentials": "Live Credentials",
             "testApiKey": "Test API Key *",
-            "testApiKeyPlaceholderRazorpay": "rzp_test_xxxxxxxxxxxxx",
+            "testApiKeyPlaceholderCashfree": "rzp_test_xxxxxxxxxxxxx",
             "testApiKeyPlaceholderStripe": "pk_test_xxxxxxxxxxxxx",
             "testApiSecret": "Test API Secret *",
             "testApiSecretPlaceholder": "Enter Test Secret Key",
             "liveApiKey": "Live API Key *",
-            "liveApiKeyPlaceholderRazorpay": "rzp_live_xxxxxxxxxxxxx",
+            "liveApiKeyPlaceholderCashfree": "rzp_live_xxxxxxxxxxxxx",
             "liveApiKeyPlaceholderStripe": "pk_live_xxxxxxxxxxxxx",
             "liveApiSecret": "Live API Secret *",
             "liveApiSecretPlaceholder": "Enter Live Secret Key",
@@ -2123,12 +2123,12 @@
             "updateSettings": "Update Settings",
             "saveSettings": "Save Settings"
         },
-        "razorpay": {
-            "title": "Razorpay Configuration",
-            "description": "Get your Razorpay credentials from the Razorpay Dashboard. You'll need both Test and Live credentials.",
+        "cashfree": {
+            "title": "Cashfree Configuration",
+            "description": "Get your Cashfree credentials from the Cashfree Dashboard. You'll need both Test and Live credentials.",
             "testKeyInfo": "Test keys start with",
             "liveKeyInfo": "Live keys start with",
-            "getKeys": "Get Razorpay API Keys →"
+            "getKeys": "Get Cashfree API Keys →"
         },
         "stripe": {
             "title": "Stripe Configuration",
@@ -3553,13 +3553,116 @@
             "team": "Team"
         },
         "channel_setting": {
-            "tabName": "WhatsApp"
+            "tabName": "WhatsApp",
+            "title": "WhatsApp Channels",
+            "description": "Manage your connected WhatsApp Business numbers and channel health.",
+            "noChannels": "No WhatsApp channels connected yet.",
+            "addFirstChannel": "Connect WhatsApp",
+            "active": "Active",
+            "mmLite": "MM Lite",
+            "phone": "Phone",
+            "phoneNumberId": "Phone Number ID",
+            "businessAccountId": "Business Account ID",
+            "notSet": "Not set",
+            "channelHealth": "Channel Health",
+            "lastChecked": "Last checked",
+            "refresh": "Refresh",
+            "test": "Send Test Message",
+            "checkingHealth": "Checking Health",
+            "verifyingConnection": "Verifying your channel connection…",
+            "channelHealthy": "Channel Healthy",
+            "channelHealthyDesc": "All systems are operating normally.",
+            "channelWarnings": "Channel Warnings",
+            "channelWarningsDesc": "Some issues were detected with your channel.",
+            "channelIssues": "Channel Issues",
+            "channelIssuesDesc": "Your channel has issues that need attention.",
+            "healthCheckFailed": "Health Check Failed",
+            "healthCheckFailedDesc": "Unable to check channel health. Please try again.",
+            "healthStatus": {
+                "Healthy": "Healthy",
+                "Warning": "Warning",
+                "Error": "Error",
+                "unknown": "Unknown",
+                "error": "Error"
+            },
+            "healthDetails": {
+                "accountMode": "Account Mode",
+                "qualityRating": "Quality Rating",
+                "messagingLimit": "Messaging Limit",
+                "throughput": "Throughput",
+                "verification": "Verification",
+                "nameStatus": "Display Name Status",
+                "errorLabel": "Error",
+                "errorCode": "Error Code",
+                "errorType": "Error Type"
+            }
         },
         "ai_setting": {
             "tabName": "AI"
         },
         "api_key_setting": {
-            "tabName": "API Keys"
+            "tabName": "API Keys",
+            "title": "API Keys",
+            "description": "Create and manage API keys to integrate with external applications.",
+            "createApiKey": "Create API Key",
+            "noApiKeys": "No API keys created yet.",
+            "createFirst": "Create Your First API Key",
+            "active": "Active",
+            "revoked": "Revoked",
+            "created": "Created",
+            "lastUsed": "Last used",
+            "requests": "Total requests",
+            "monthlyRequestsLabel": "This month",
+            "revoke": "Revoke",
+            "error": "Error",
+            "copied": "Copied!",
+            "copiedDesc": "Value copied to clipboard.",
+            "apiKeyRevoked": "API Key Revoked",
+            "apiKeyRevokedDesc": "The API key has been successfully revoked.",
+            "nameRequired": "Name Required",
+            "nameRequiredDesc": "Please enter a name for your API key.",
+            "usage": {
+                "totalRequests": "Total Requests",
+                "monthlyRequests": "Monthly Requests",
+                "activeKeys": "Active Keys",
+                "revokedKeys": "Revoked Keys"
+            },
+            "documentation": {
+                "title": "API Documentation",
+                "description": "Use your API key to authenticate requests to the Waki API.",
+                "baseUrl": "Base URL",
+                "authentication": "Authentication",
+                "authDesc": "Include your API key in the Authorization header of every request:",
+                "exampleRequest": "Example Request"
+            },
+            "createForm": {
+                "title": "Create New API Key",
+                "keyName": "Key Name",
+                "keyNamePlaceholder": "e.g. My Integration, CRM Key",
+                "keyNameHelper": "Give your key a descriptive name to identify it later.",
+                "channel": "Channel (Optional)",
+                "allChannels": "All Channels",
+                "channelHelper": "Restrict this key to a specific WhatsApp channel, or leave blank for all channels.",
+                "permissions": "Permissions",
+                "cancel": "Cancel",
+                "creating": "Creating...",
+                "createKey": "Create Key"
+            },
+            "keyCreatedDialog": {
+                "title": "API Key Created",
+                "warning": "Copy your API key and secret now. You won't be able to see the secret again.",
+                "apiKeyLabel": "API Key",
+                "apiKeyCopied": "API Key copied!",
+                "secretLabel": "Secret",
+                "secretCopied": "Secret copied!",
+                "done": "Done, I've saved my key"
+            },
+            "revokeDialog": {
+                "title": "Revoke API Key",
+                "description": "Are you sure you want to revoke this API key? Any applications using this key will immediately lose access.",
+                "cancel": "Cancel",
+                "confirm": "Yes, Revoke Key"
+            }
         },
         "account": {
             "title": "Account Information",

@@ -1,24 +1,17 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import type { Request, Response } from "express";
 import { DiployError, asyncHandler as _dHandler, diployLogger, HTTP_STATUS } from "@diploy/core";
 import { storage } from "../storage";
-import { contacts, users, insertContactSchema } from "@shared/schema";
+import { contacts, users, insertContactSchema, automationExecutions } from "@shared/schema";
 import { AppError, asyncHandler } from "../middlewares/error.middleware";
 import { db, dbRead } from "server/db";
 import { and, eq, ilike, inArray, or, sql } from "drizzle-orm";
@@ -555,12 +548,22 @@ export const deleteBulkContacts = asyncHandler(
       throw new AppError(400, "No contact IDs provided");
     }
 
+    // Step 1: Nullify contactId in automation_executions (no cascade defined on FK)
+    // This preserves automation history but removes the blocking FK reference
+    if (ids.length > 0) {
+      await db
+        .update(automationExecutions)
+        .set({ contactId: null })
+        .where(inArray(automationExecutions.contactId, ids));
+    }
+
+    // Step 2: Now safely delete contacts
     const result = await db
       .delete(contacts)
       .where(inArray(contacts.id, ids));
 
-    // Optionally check how many rows were affected
-    if (result.rowCount === 0) {
+    // rowCount can be null in some drivers — treat null as success if no error thrown
+    if (result.rowCount !== null && result.rowCount === 0) {
       throw new AppError(404, "No contacts found to delete");
     }
 

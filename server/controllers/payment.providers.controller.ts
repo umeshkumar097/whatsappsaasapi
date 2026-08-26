@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { Request, Response } from 'express';
 import { DiployError, asyncHandler as _dHandler, diployLogger, HTTP_STATUS } from "@diploy/core";
 import { db } from '../db';
@@ -29,7 +22,7 @@ import { paymentProviders, plans } from '@shared/schema';
 const SYNCED_ID_COLUMNS_BY_PROVIDER: Record<string, (keyof typeof plans.$inferSelect)[]> = {
   stripe: ["stripeProductId", "stripePriceIdMonthly", "stripePriceIdAnnual"],
   paypal: ["paypalProductId", "paypalPlanIdMonthly", "paypalPlanIdAnnual"],
-  razorpay: ["razorpayPlanIdMonthly", "razorpayPlanIdAnnual"],
+  cashfree: ["cashfreePlanIdMonthly", "cashfreePlanIdAnnual"],
   paystack: ["paystackPlanCodeMonthly", "paystackPlanCodeAnnual"],
   mercadopago: ["mercadopagoPlanIdMonthly", "mercadopagoPlanIdAnnual"],
 };
@@ -159,7 +152,7 @@ export const getProviderById = async (req: Request, res: Response) => {
   }
 };
 
-// Get provider by key (e.g., "razorpay", "stripe")
+// Get provider by key (e.g., "cashfree", "stripe")
 export const getProviderByKey = async (req: Request, res: Response) => {
   try {
     const { key } = req.params;

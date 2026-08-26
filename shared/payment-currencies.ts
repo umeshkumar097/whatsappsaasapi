@@ -22,14 +22,14 @@
 
 export type PaymentProviderKey =
   | "stripe"
-  | "razorpay"
+  | "cashfree"
   | "paypal"
   | "paystack"
   | "mercadopago";
 
 export const PROVIDER_CURRENCY_OPTIONS: Record<PaymentProviderKey, string[]> = {
   stripe: ["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CHF", "SGD", "HKD", "NZD"],
-  razorpay: ["INR"],
+  cashfree: ["INR"],
   paypal: [
     "USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CHF", "SGD", "HKD", "NZD",
     "SEK", "NOK", "DKK", "PLN", "CZK", "HUF", "ILS", "MXN", "BRL", "TWD",
@@ -41,7 +41,7 @@ export const PROVIDER_CURRENCY_OPTIONS: Record<PaymentProviderKey, string[]> = {
 
 export const PROVIDER_METHOD_OPTIONS: Record<PaymentProviderKey, string[]> = {
   stripe: ["card"],
-  razorpay: ["card", "upi", "wallet", "netbanking"],
+  cashfree: ["card", "upi", "wallet", "netbanking"],
   paypal: ["paypal", "card"],
   paystack: ["card", "bank_transfer", "mobile_money", "ussd"],
   mercadopago: ["card", "pix", "boleto", "debit"],

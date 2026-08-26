@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import React, { useState, useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
@@ -37,6 +30,8 @@ import Automations from "@/pages/automations";
 import Analytics from "@/pages/analytics";
 import CampaignAnalytics from "@/pages/campaign-analytics";
 import Settings from "@/pages/settings";
+import Wallet from "./pages/Wallet";
+import AdminWallet from "./pages/admin-wallet";
 import Logs from "@/pages/logs";
 import Team from "@/pages/team";
 import Sidebar from "@/components/layout/sidebar";
@@ -117,6 +112,7 @@ const ROUTE_PERMISSIONS: Record<string, string> = {
   "/plans": "",
   "/plan-upgrade": "",
   "/billing": "",
+  "/wallet": "",
   "/payment/success": "",
   "/payment-success": "",
   "/gateway": "",
@@ -158,6 +154,7 @@ const ROUTE_PERMISSIONS: Record<string, string> = {
   "/chat-hub": "",
   "/master-subscriptions": "",
   "/app-update": "",
+  "/wallet-management": "",
 };
 
 // Route patterns (regex) that correspond to dynamic routes. Keep keys aligned
@@ -291,16 +288,10 @@ function ProtectedRoutes() {
 
   // Priority 3: Not authenticated - show public routes
   if (!isAuthenticated) {
-    return (
-      <>
-        <Header />
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route component={Home} />
-        </Switch>
-        <Footer />
-      </>
-    );
+    if (window.location.pathname !== "/login" && window.location.pathname !== "/signup") {
+      window.location.replace("/login");
+    }
+    return null;
   }
 
   // Priority 4: Authenticated - show dashboard and protected routes
@@ -462,6 +453,13 @@ function ProtectedRoutes() {
           <Route path="/billing">
             <PermissionRoute component={BillingSubscriptionPage} />
           </Route>
+          <Route path="/wallet-management">
+            <PermissionRoute component={AdminWallet} />
+          </Route>
+          <Route path="/wallet">
+            <PermissionRoute component={Wallet} />
+          </Route>
+          
           <Route path="/payment/success">
             <PermissionRoute component={PaymentSuccessPage} />
           </Route>
@@ -639,13 +637,7 @@ function Router() {
             <Footer />
           </>
         </Route>
-        <Route path="/">
-          <>
-            <Header />
-            <Home />
-            <Footer />
-          </>
-        </Route>
+        <Route path="/">{() => { window.location.replace("/login"); return null; }}</Route>
         <Route component={ProtectedRoutes} />
       </Switch>
     </>

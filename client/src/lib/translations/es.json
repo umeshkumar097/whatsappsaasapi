@@ -2143,7 +2143,7 @@
     "form": {
       "providerLabel": "Proveedor de Pago *",
       "selectProvider": "Seleccionar proveedor",
-      "razorpay": "Razorpay",
+      "cashfree": "Cashfree",
       "stripe": "Stripe",
       "environmentLabel": "Modo de Entorno *",
       "testMode": "Modo de Prueba",
@@ -2153,12 +2153,12 @@
       "testCredentials": "Credenciales de Prueba",
       "liveCredentials": "Credenciales en Vivo",
       "testApiKey": "Clave API de Prueba *",
-      "testApiKeyPlaceholderRazorpay": "rzp_test_xxxxxxxxxxxxx",
+      "testApiKeyPlaceholderCashfree": "rzp_test_xxxxxxxxxxxxx",
       "testApiKeyPlaceholderStripe": "pk_test_xxxxxxxxxxxxx",
       "testApiSecret": "Secreto API de Prueba *",
       "testApiSecretPlaceholder": "Ingresar Clave Secreta de Prueba",
       "liveApiKey": "Clave API en Vivo *",
-      "liveApiKeyPlaceholderRazorpay": "rzp_live_xxxxxxxxxxxxx",
+      "liveApiKeyPlaceholderCashfree": "rzp_live_xxxxxxxxxxxxx",
       "liveApiKeyPlaceholderStripe": "pk_live_xxxxxxxxxxxxx",
       "liveApiSecret": "Secreto API en Vivo *",
       "liveApiSecretPlaceholder": "Ingresar Clave Secreta en Vivo",
@@ -2168,12 +2168,12 @@
       "updateSettings": "Actualizar Configuración",
       "saveSettings": "Guardar Configuración"
     },
-    "razorpay": {
-      "title": "Configuración de Razorpay",
-      "description": "Obtén tus credenciales de Razorpay desde el Panel de Razorpay. Necesitarás credenciales de Prueba y en Vivo.",
+    "cashfree": {
+      "title": "Configuración de Cashfree",
+      "description": "Obtén tus credenciales de Cashfree desde el Panel de Cashfree. Necesitarás credenciales de Prueba y en Vivo.",
       "testKeyInfo": "Las claves de prueba comienzan con",
       "liveKeyInfo": "Las claves en vivo comienzan con",
-      "getKeys": "Obtener Claves API de Razorpay →"
+      "getKeys": "Obtener Claves API de Cashfree →"
     },
     "stripe": {
       "title": "Configuración de Stripe",

@@ -1,278 +1,87 @@
-/**
- * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
- *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
- * ============================================================
- */
-
 import React from "react";
-import PolicyLayout, { PolicySection } from "./PolicyLayout";
-import { useTranslation } from "@/lib/i18n";
-import { useQuery } from "@tanstack/react-query";
-import { AppSettings } from "@/types/types";
+import { Cookie, Shield, ToggleLeft, Info } from "lucide-react";
 
-const CookiePolicy = () => {
-  const { t } = useTranslation();
+const sections = [
+  {
+    icon: Info,
+    title: "What Are Cookies?",
+    body: "Cookies are small text files stored on your device when you visit a website. They help us remember your preferences, keep you logged in, and understand how you use our platform so we can improve it.",
+  },
+  {
+    icon: Cookie,
+    title: "Cookies We Use",
+    body: "We use the following types of cookies:",
+    items: [
+      "Essential Cookies — Required for the platform to function. Cannot be disabled.",
+      "Analytics Cookies — Help us understand how users navigate Waki (e.g., Google Analytics).",
+      "Preference Cookies — Remember your language, theme and other settings.",
+      "Marketing Cookies — Used to show relevant ads (only with your consent).",
+    ],
+  },
+  {
+    icon: Shield,
+    title: "Third-Party Cookies",
+    body: "Some features use third-party services that may set their own cookies. These include Google Analytics for usage statistics, Cashfree for payment processing, and Meta Pixel for advertising performance measurement.",
+  },
+  {
+    icon: ToggleLeft,
+    title: "Managing Your Cookies",
+    body: "You can control cookies through your browser settings. Most browsers allow you to refuse or delete cookies. However, disabling essential cookies may prevent some parts of Waki from working correctly.",
+    items: [
+      "Chrome: Settings → Privacy & Security → Cookies",
+      "Firefox: Options → Privacy & Security → Cookies",
+      "Safari: Preferences → Privacy → Cookies",
+      "Edge: Settings → Privacy & Security → Cookies",
+    ],
+  },
+  {
+    icon: Info,
+    title: "Updates to This Policy",
+    body: "We may update this Cookie Policy from time to time. Any changes will be posted here with an updated date. Continued use of Waki after changes means you accept the updated policy.",
+  },
+  {
+    icon: Shield,
+    title: "Contact Us",
+    body: "Questions about cookies? Contact us at privacy@aiclex.in — Aiclex Technologies, Jaipur, Rajasthan, India.",
+  },
+];
 
-  const whatAreCookiesParagraphs = t(
-    "cookiePolicy.sections.whatAreCookies.paragraphs",
-    { returnObjects: true }
-  ) as string[];
+const CookiePolicy = () => (
+  <section style={{ background: "linear-gradient(180deg, #0a2a1a 0%, #061510 100%)" }} className="min-h-screen py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(37,211,102,0.3), transparent)" }} />
+    <div className="max-w-3xl mx-auto">
+      <div className="text-center mb-16">
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6" style={{ background: "rgba(37,211,102,0.12)", border: "1px solid rgba(37,211,102,0.25)" }}>
+          <Cookie className="w-8 h-8" style={{ color: "#25d366" }} />
+        </div>
+        <h1 className="text-5xl font-black text-white mb-4">Cookie Policy</h1>
+        <p style={{ color: "rgba(255,255,255,0.5)" }}>Last updated: August 2026</p>
+        <p className="mt-4 text-lg" style={{ color: "rgba(255,255,255,0.6)" }}>How Waki by Aiclex Technologies uses cookies and similar technologies.</p>
+      </div>
 
-  const howWeUseList = t("cookiePolicy.sections.howWeUseCookies.list", {
-    returnObjects: true,
-  }) as string[];
-
-  const thirdPartyList = t("cookiePolicy.sections.thirdPartyCookies.list", {
-    returnObjects: true,
-  }) as string[];
-
-  const cookieDurationList = t("cookiePolicy.sections.cookieDuration.list", {
-    returnObjects: true,
-  }) as string[];
-
-  const browserSettingsList = t(
-    "cookiePolicy.sections.managingCookies.browserSettings.list",
-    { returnObjects: true }
-  ) as string[];
-
-  const optOutLinks = t(
-    "cookiePolicy.sections.managingCookies.optOutLinks.links",
-    { returnObjects: true }
-  ) as { label: string; text: string; href: string }[];
-
-  const impactList = t("cookiePolicy.sections.impactDisabling.list", {
-    returnObjects: true,
-  }) as string[];
-
-  const updatesParagraphs = t("cookiePolicy.sections.updates.paragraphs", {
-    returnObjects: true,
-  }) as string[];
-
-  const { data: brandSettings } = useQuery<AppSettings>({
-    queryKey: ["/api/brand-settings"],
-    queryFn: () => fetch("/api/brand-settings").then((res) => res.json()),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const suportEmail = brandSettings?.supportEmail ?? "";
-
-  return (
-    <PolicyLayout
-      title={t("cookiePolicy.hero.title")}
-      lastUpdated={t("cookiePolicy.hero.lastUpdated")}
-    >
-      {/* What Are Cookies */}
-      <PolicySection title={t("cookiePolicy.sections.whatAreCookies.title")}>
-        {whatAreCookiesParagraphs.map((p, idx) => (
-          <p key={idx}>{p}</p>
+      <div className="space-y-5">
+        {sections.map((s, i) => (
+          <div key={i} className="rounded-2xl p-7" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <div className="flex items-center gap-3 mb-3">
+              <s.icon className="w-5 h-5 flex-shrink-0" style={{ color: "#25d366" }} />
+              <h2 className="text-lg font-bold text-white">{s.title}</h2>
+            </div>
+            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{s.body}</p>
+            {s.items && (
+              <ul className="mt-3 space-y-2">
+                {s.items.map((item, j) => (
+                  <li key={j} className="flex items-start gap-2.5">
+                    <span className="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#25d366" }} />
+                    <span className="text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         ))}
-      </PolicySection>
-
-      {/* How We Use Cookies */}
-      <PolicySection title={t("cookiePolicy.sections.howWeUseCookies.title")}>
-        <p>{t("cookiePolicy.sections.howWeUseCookies.intro")}</p>
-        <ul className="list-disc pl-6 space-y-2">
-          {howWeUseList.map((item, idx) => (
-            <li key={idx}>{item}</li>
-          ))}
-        </ul>
-      </PolicySection>
-
-      {/* Types of Cookies */}
-      <PolicySection title={t("cookiePolicy.sections.typesOfCookies.title")}>
-        <div className="space-y-6">
-          {/* Essential Cookies */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {t("cookiePolicy.sections.typesOfCookies.essential.title")}
-            </h3>
-            <p>{t("cookiePolicy.sections.typesOfCookies.essential.text")}</p>
-            <div className="bg-gray-50 p-4 rounded-lg mt-3">
-              <p>
-                <strong>Examples:</strong>{" "}
-                {t("cookiePolicy.sections.typesOfCookies.essential.examples")}
-              </p>
-            </div>
-          </div>
-
-          {/* Performance Cookies */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {t("cookiePolicy.sections.typesOfCookies.performance.title")}
-            </h3>
-            <p>{t("cookiePolicy.sections.typesOfCookies.performance.text")}</p>
-            <div className="bg-gray-50 p-4 rounded-lg mt-3">
-              <p>
-                <strong>Examples:</strong>{" "}
-                {t("cookiePolicy.sections.typesOfCookies.performance.examples")}
-              </p>
-            </div>
-          </div>
-
-          {/* Functional Cookies */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {t("cookiePolicy.sections.typesOfCookies.functional.title")}
-            </h3>
-            <p>{t("cookiePolicy.sections.typesOfCookies.functional.text")}</p>
-            <div className="bg-gray-50 p-4 rounded-lg mt-3">
-              <p>
-                <strong>Examples:</strong>{" "}
-                {t("cookiePolicy.sections.typesOfCookies.functional.examples")}
-              </p>
-            </div>
-          </div>
-
-          {/* Marketing Cookies */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {t("cookiePolicy.sections.typesOfCookies.marketing.title")}
-            </h3>
-            <p>{t("cookiePolicy.sections.typesOfCookies.marketing.text")}</p>
-            <div className="bg-gray-50 p-4 rounded-lg mt-3">
-              <p>
-                <strong>Examples:</strong>{" "}
-                {t("cookiePolicy.sections.typesOfCookies.marketing.examples")}
-              </p>
-            </div>
-          </div>
-        </div>
-      </PolicySection>
-
-      {/* Third-Party Cookies */}
-      <PolicySection title={t("cookiePolicy.sections.thirdPartyCookies.title")}>
-        <p>{t("cookiePolicy.sections.thirdPartyCookies.intro")}</p>
-        <ul className="list-disc pl-6 space-y-2">
-          {thirdPartyList.map((item, idx) => (
-            <li key={idx}>{item}</li>
-          ))}
-        </ul>
-        <p>{t("cookiePolicy.sections.thirdPartyCookies.outro")}</p>
-      </PolicySection>
-
-      {/* Cookie Duration */}
-      <PolicySection title={t("cookiePolicy.sections.cookieDuration.title")}>
-        <p>{t("cookiePolicy.sections.cookieDuration.intro")}</p>
-        <ul className="list-disc pl-6 space-y-2">
-          {cookieDurationList.map((item, idx) => (
-            <li key={idx}>{item}</li>
-          ))}
-        </ul>
-        <p>{t("cookiePolicy.sections.cookieDuration.extra")}</p>
-      </PolicySection>
-
-      {/* Managing Cookie Preferences */}
-      <PolicySection title={t("cookiePolicy.sections.managingCookies.title")}>
-        <p>{t("cookiePolicy.sections.managingCookies.intro")}</p>
-
-        <div className="space-y-4">
-          {/* Browser Settings */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {t("cookiePolicy.sections.managingCookies.browserSettings.title")}
-            </h3>
-            <p>
-              {t("cookiePolicy.sections.managingCookies.browserSettings.text")}
-            </p>
-            <ul className="list-disc pl-6 space-y-1">
-              {browserSettingsList.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Cookie Consent Manager */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {t("cookiePolicy.sections.managingCookies.consentManager.title")}
-            </h3>
-            <p>
-              {t("cookiePolicy.sections.managingCookies.consentManager.text")}
-            </p>
-          </div>
-
-          {/* Opt-Out Links */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {t("cookiePolicy.sections.managingCookies.optOutLinks.title")}
-            </h3>
-            <p>
-              {t("cookiePolicy.sections.managingCookies.optOutLinks.intro")}
-            </p>
-            <ul className="list-disc pl-6 space-y-1">
-              {optOutLinks.map((link, idx) => (
-                <li key={idx}>
-                  <strong>{link.label}</strong>{" "}
-                  <a
-                    href={link.href}
-                    className="text-green-600 hover:underline"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {link.text}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </PolicySection>
-
-      {/* Impact of Disabling Cookies */}
-      <PolicySection title={t("cookiePolicy.sections.impactDisabling.title")}>
-        <p>{t("cookiePolicy.sections.impactDisabling.intro")}</p>
-        <ul className="list-disc pl-6 space-y-2">
-          {impactList.map((item, idx) => (
-            <li key={idx}>{item}</li>
-          ))}
-        </ul>
-      </PolicySection>
-
-      {/* Updates to This Policy */}
-      <PolicySection title={t("cookiePolicy.sections.updates.title")}>
-        {updatesParagraphs.map((p, idx) => (
-          <p key={idx}>{p}</p>
-        ))}
-      </PolicySection>
-
-      {/* Contact Us */}
-      <PolicySection title={t("cookiePolicy.sections.contact.title")}>
-        <p>{t("cookiePolicy.sections.contact.intro")}</p>
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <p>
-            <strong>{t("cookiePolicy.sections.contact.emailLabel")}</strong>{" "}
-            <a
-              href={`mailto:${t("cookiePolicy.sections.contact.email")}`}
-              className="text-green-600 hover:underline"
-            >
-              {t("cookiePolicy.sections.contact.email", {
-                suportEmail,
-              })}
-            </a>
-          </p>
-          <p>
-            <strong>{t("cookiePolicy.sections.contact.addressLabel")}</strong>{" "}
-            {t("cookiePolicy.sections.contact.address")}
-          </p>
-          <p>
-            <strong>{t("cookiePolicy.sections.contact.phoneLabel")}</strong>{" "}
-            {t("cookiePolicy.sections.contact.phone")}
-          </p>
-        </div>
-      </PolicySection>
-    </PolicyLayout>
-  );
-};
+      </div>
+    </div>
+  </section>
+);
 
 export default CookiePolicy;

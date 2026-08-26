@@ -7,6 +7,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Papa from "papaparse";
+import ExcelJS from "exceljs";
+import { FieldMappingDialog, type RawRow, type FieldMapping } from "../../pages/contacts/FieldMappingDialog";
 import {
   Sheet,
   SheetContent,
@@ -147,6 +149,10 @@ export function GroupMembersDrawer({
     total: number;
     label: string;
   }>({ active: false, current: 0, total: 0, label: "" });
+  const [mappingData, setMappingData] = useState<{
+    headers: string[];
+    rawRows: RawRow[];
+  } | null>(null);
   const [importResult, setImportResult] = useState<{
     imported: number;
     duplicates: number;
@@ -555,67 +561,121 @@ export function GroupMembersDrawer({
     event.target.value = "";
     if (!file || !group?.name) return;
 
-    if (!file.name.toLowerCase().endsWith(".csv")) {
+    const fileName = file.name.toLowerCase();
+
+    if (fileName.endsWith(".csv")) {
+      try {
+        const text = await decodeFile(file);
+        const results = Papa.parse(text, { header: true, skipEmptyLines: true });
+        
+        if (results.errors.length > 0) {
+          const sample = results.errors.slice(0, 3).map((e) => e.message).join("; ");
+          toast({
+            title: "CSV parse warnings",
+            description: `${results.errors.length} row(s) had parse issues. First: ${sample}`,
+          });
+        }
+        
+        const rawRows = (results.data as RawRow[]).filter((row) => row && Object.keys(row).length > 0);
+        if (rawRows.length === 0) {
+          toast({ title: "Error", description: "No data rows found.", variant: "destructive" });
+          return;
+        }
+        
+        const headers = results.meta.fields || Object.keys(rawRows[0] || {});
+        setMappingData({ headers, rawRows });
+      } catch (err: any) {
+        toast({ title: "Parse Error", description: err.message || "Failed to parse CSV file.", variant: "destructive" });
+      }
+    } else if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
+      try {
+        const workbook = new ExcelJS.Workbook();
+        const arrayBuffer = await file.arrayBuffer();
+        await workbook.xlsx.load(arrayBuffer);
+        
+        const worksheet = workbook.worksheets[0];
+        if (!worksheet) {
+          toast({ title: "Error", description: "No worksheet found.", variant: "destructive" });
+          return;
+        }
+        
+        const headerRow = worksheet.getRow(1);
+        if (!headerRow || !headerRow.values) {
+          toast({ title: "Error", description: "No header row found.", variant: "destructive" });
+          return;
+        }
+        
+        const originalHeaders: string[] = Array.isArray(headerRow.values)
+          ? headerRow.values.slice(1).map((h: any) => typeof h === "string" ? h.trim() : typeof h === "number" ? String(h) : "").filter(Boolean)
+          : [];
+          
+        const rawRows: RawRow[] = [];
+        worksheet.eachRow((row, rowNumber) => {
+          if (rowNumber === 1) return;
+          const rowData: RawRow = {};
+          if (row.values && Array.isArray(row.values)) {
+            row.values.slice(1).forEach((cell: any, idx: number) => {
+              const key = originalHeaders[idx];
+              if (key) {
+                if (typeof cell === "string") rowData[key] = cell.trim();
+                else if (typeof cell === "number") rowData[key] = String(cell);
+                else if (cell && typeof cell === "object" && "text" in cell) rowData[key] = String((cell as any).text);
+                else rowData[key] = "";
+              }
+            });
+          }
+          if (Object.values(rowData).some((v) => v)) rawRows.push(rowData);
+        });
+        
+        if (rawRows.length === 0) {
+          toast({ title: "Error", description: "No data rows found.", variant: "destructive" });
+          return;
+        }
+        
+        setMappingData({ headers: originalHeaders, rawRows });
+      } catch (err: any) {
+        toast({ title: "Parse Error", description: "Failed to read Excel file.", variant: "destructive" });
+      }
+    } else {
+      toast({ title: "Unsupported file", description: "Please upload .csv or .xlsx file.", variant: "destructive" });
+    }
+  };
+
+  const handleConfirmMapping = async (fieldMapping: FieldMapping) => {
+    if (!mappingData || !group?.name) return;
+    setMappingData(null);
+
+    const all: ParsedRow[] = mappingData.rawRows.map((row, idx) => {
+      const groupsSet = new Set<string>();
+      if (fieldMapping.groups && row[fieldMapping.groups]) {
+        row[fieldMapping.groups].split(",").map(g => g.trim()).filter(Boolean).forEach(g => groupsSet.add(g));
+      }
+      groupsSet.add(group.name);
+      
+      return {
+        name: fieldMapping.name ? row[fieldMapping.name]?.toString().trim() || "" : "",
+        phone: fieldMapping.phone ? String(row[fieldMapping.phone] || "").trim() : "",
+        email: fieldMapping.email ? row[fieldMapping.email]?.toString().trim() || "" : "",
+        groups: Array.from(groupsSet),
+        tags: fieldMapping.tags && row[fieldMapping.tags] ? row[fieldMapping.tags].split(",").map(g => g.trim()).filter(Boolean) : [],
+        csvRow: idx + 2,
+      };
+    });
+
+    const noPhone = all.filter((c) => !c.phone).length;
+    const invalidFormat = all.filter((c) => c.phone && !isValidPhone(c.phone)).length;
+    const valid = all.filter((c) => c.phone && isValidPhone(c.phone));
+
+    if (valid.length === 0) {
       toast({
-        title: "Unsupported file",
-        description: "Please upload a .csv file.",
+        title: "Nothing to import",
+        description: "No rows with a valid phone number were found.",
         variant: "destructive",
       });
       return;
     }
 
-    try {
-      const text = await decodeFile(file);
-      const results = Papa.parse(text, { header: true, skipEmptyLines: true });
-
-      if (results.errors.length > 0) {
-        const sample = results.errors
-          .slice(0, 3)
-          .map((e) => e.message)
-          .join("; ");
-        toast({
-          title: "CSV parse warnings",
-          description: `${results.errors.length} row(s) had parse issues and may be skipped. First: ${sample}`,
-        });
-      }
-
-      const all: ParsedRow[] = (results.data as any[])
-        .map((row, idx) => ({ row, csvRow: idx + 2 })) // +1 for header, +1 for 1-based
-        .filter(({ row }) => row && Object.keys(row).length > 0)
-        .map(({ row, csvRow }) => {
-          const groupsSet = new Set<string>(splitMulti(row?.groups));
-          groupsSet.add(group.name);
-          return {
-            name: row?.name?.toString().trim() || "",
-            phone: row?.phone ? String(row.phone).trim() : "",
-            email: row?.email?.toString().trim() || "",
-            groups: Array.from(groupsSet),
-            tags: splitMulti(row?.tags),
-            csvRow,
-          };
-        });
-
-      const noPhone = all.filter((c) => !c.phone).length;
-      const invalidFormat = all.filter((c) => c.phone && !isValidPhone(c.phone)).length;
-      const valid = all.filter((c) => c.phone && isValidPhone(c.phone));
-
-      if (valid.length === 0) {
-        toast({
-          title: "Nothing to import",
-          description: "No rows with a valid phone number were found.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      await uploadInChunks(valid, { noPhone, invalidFormat });
-    } catch (err: any) {
-      toast({
-        title: "CSV parse error",
-        description: err?.message || "Failed to read CSV file.",
-        variant: "destructive",
-      });
-    }
+    await uploadInChunks(valid, { noPhone, invalidFormat });
   };
 
   const existingIds = useMemo(
@@ -625,6 +685,16 @@ export function GroupMembersDrawer({
 
   return (
     <>
+      
+      {/* Field Mapping Dialog */}
+      <FieldMappingDialog
+        open={!!mappingData}
+        csvHeaders={mappingData?.headers || []}
+        previewRows={mappingData?.rawRows || []}
+        totalRows={mappingData?.rawRows.length || 0}
+        onConfirm={handleConfirmMapping}
+        onCancel={() => setMappingData(null)}
+      />
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent className="w-full sm:max-w-xl flex flex-col p-0">
           <SheetHeader className="px-6 pt-6">
@@ -657,7 +727,7 @@ export function GroupMembersDrawer({
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".csv"
+                  accept=".csv,.xlsx,.xls"
                   className="hidden"
                   onChange={handleImportFile}
                   data-testid="input-group-import-csv"
@@ -670,7 +740,7 @@ export function GroupMembersDrawer({
                   data-testid="button-group-import-csv"
                 >
                   <Upload className="h-4 w-4 mr-1.5" />
-                  {importState.active ? "Importing…" : "Import CSV"}
+                  {importState.active ? "Importing…" : "Import File"}
                 </Button>
               </>
             )}

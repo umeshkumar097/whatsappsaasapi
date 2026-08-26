@@ -2132,7 +2132,7 @@
     "form": {
       "providerLabel": "भुगतान प्रदाता *",
       "selectProvider": "प्रदाता चुनें",
-      "razorpay": "Razorpay",
+      "cashfree": "Cashfree",
       "stripe": "Stripe",
       "environmentLabel": "पर्यावरण मोड *",
       "testMode": "टेस्ट मोड",
@@ -2142,12 +2142,12 @@
       "testCredentials": "टेस्ट क्रेडेंशियल्स",
       "liveCredentials": "लाइव क्रेडेंशियल्स",
       "testApiKey": "टेस्ट API की *",
-      "testApiKeyPlaceholderRazorpay": "rzp_test_xxxxxxxxxxxxx",
+      "testApiKeyPlaceholderCashfree": "rzp_test_xxxxxxxxxxxxx",
       "testApiKeyPlaceholderStripe": "pk_test_xxxxxxxxxxxxx",
       "testApiSecret": "टेस्ट API सीक्रेट *",
       "testApiSecretPlaceholder": "टेस्ट सीक्रेट की डालें",
       "liveApiKey": "लाइव API की *",
-      "liveApiKeyPlaceholderRazorpay": "rzp_live_xxxxxxxxxxxxx",
+      "liveApiKeyPlaceholderCashfree": "rzp_live_xxxxxxxxxxxxx",
       "liveApiKeyPlaceholderStripe": "pk_live_xxxxxxxxxxxxx",
       "liveApiSecret": "लाइव API सीक्रेट *",
       "liveApiSecretPlaceholder": "लाइव सीक्रेट की डालें",
@@ -2157,12 +2157,12 @@
       "updateSettings": "सेटिंग्स अपडेट करें",
       "saveSettings": "सेटिंग सेव करें"
     },
-    "razorpay": {
-      "title": "Razorpay कॉन्फ़िगरेशन",
-      "description": "Razorpay डैशबोर्ड से अपनी क्रेडेंशियल्स प्राप्त करें. दोनों टेस्ट और लाइव क्रेडेंशियल्स चाहिए.",
+    "cashfree": {
+      "title": "Cashfree कॉन्फ़िगरेशन",
+      "description": "Cashfree डैशबोर्ड से अपनी क्रेडेंशियल्स प्राप्त करें. दोनों टेस्ट और लाइव क्रेडेंशियल्स चाहिए.",
       "testKeyInfo": "टेस्ट की शुरू होता है",
       "liveKeyInfo": "लाइव की शुरू होता है",
-      "getKeys": "Razorpay API Keys प्राप्त करें →"
+      "getKeys": "Cashfree API Keys प्राप्त करें →"
     },
     "stripe": {
       "title": "Stripe कॉन्फ़िगरेशन",
@@ -3912,7 +3912,7 @@
       },
       "documentation": {
         "title": "API दस्तावेज़",
-        "description": "WhatsWay API का उपयोग कैसे करें सीखें",
+        "description": "Aiclex Technologies API का उपयोग कैसे करें सीखें",
         "baseUrl": "बेस URL",
         "authentication": "प्रमाणीकरण",
         "authDesc": "Authorization हेडर में अपनी API कुंजी शामिल करें:",

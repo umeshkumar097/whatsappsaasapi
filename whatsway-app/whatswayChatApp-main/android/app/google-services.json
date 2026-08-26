@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "664686430068",
+    "project_id": "whatsway-prod",
+    "storage_bucket": "whatsway-prod.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:664686430068:android:369f03ad",
+        "android_client_info": {
+          "package_name": "com.whatsway.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOtsoZq_bIne"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

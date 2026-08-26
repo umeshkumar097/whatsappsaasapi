@@ -2133,7 +2133,7 @@
     "form": {
       "providerLabel": "Provedor de Pagamento *",
       "selectProvider": "Selecione um provedor",
-      "razorpay": "Razorpay",
+      "cashfree": "Cashfree",
       "stripe": "Stripe",
       "environmentLabel": "Modo Ambiente *",
       "testMode": "Modo de Teste",
@@ -2143,12 +2143,12 @@
       "testCredentials": "Credenciais de Teste",
       "liveCredentials": "Credenciais ao Vivo",
       "testApiKey": "Chave API de Teste *",
-      "testApiKeyPlaceholderRazorpay": "rzp_test_xxxxxxxxxxxxx",
+      "testApiKeyPlaceholderCashfree": "rzp_test_xxxxxxxxxxxxx",
       "testApiKeyPlaceholderStripe": "pk_test_xxxxxxxxxxxxx",
       "testApiSecret": "Segredo API de Teste *",
       "testApiSecretPlaceholder": "Insira a Chave Secreta de Teste",
       "liveApiKey": "Chave API ao Vivo *",
-      "liveApiKeyPlaceholderRazorpay": "rzp_live_xxxxxxxxxxxxx",
+      "liveApiKeyPlaceholderCashfree": "rzp_live_xxxxxxxxxxxxx",
       "liveApiKeyPlaceholderStripe": "pk_live_xxxxxxxxxxxxx",
       "liveApiSecret": "Segredo API ao Vivo *",
       "liveApiSecretPlaceholder": "Insira a Chave Secreta ao Vivo",
@@ -2158,12 +2158,12 @@
       "updateSettings": "Atualizar Configurações",
       "saveSettings": "Salvar Configurações"
     },
-    "razorpay": {
-      "title": "Configuração Razorpay",
-      "description": "Obtenha suas credenciais do Razorpay no Painel Razorpay. Você vai precisar das credenciais de Teste e ao Vivo.",
+    "cashfree": {
+      "title": "Configuração Cashfree",
+      "description": "Obtenha suas credenciais do Cashfree no Painel Cashfree. Você vai precisar das credenciais de Teste e ao Vivo.",
       "testKeyInfo": "Chaves de teste começam com",
       "liveKeyInfo": "Chaves ao vivo começam com",
-      "getKeys": "Obter Chaves de API Razorpay →"
+      "getKeys": "Obter Chaves de API Cashfree →"
     },
     "stripe": {
       "title": "Configuração Stripe",
@@ -3913,7 +3913,7 @@
       },
       "documentation": {
         "title": "Documentação da API",
-        "description": "Aprenda como usar a API WhatsWay",
+        "description": "Aprenda como usar a API Aiclex Technologies",
         "baseUrl": "URL Base",
         "authentication": "Autenticação",
         "authDesc": "Inclua sua chave API no cabeçalho de Autorização:",

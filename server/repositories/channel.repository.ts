@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { db } from "../db";
 import { eq, desc, sql, and } from "drizzle-orm";
 import { 
@@ -137,6 +130,7 @@ export class ChannelRepository {
       await tx.delete(clientApiKeys).where(eq(clientApiKeys.channelId, id));
       await tx.delete(apiLogs).where(eq(apiLogs.channelId, id));
       await tx.delete(aiSettings).where(eq(aiSettings.channelId, id));
+      await tx.delete(messageQueue).where(eq(messageQueue.channelId, id));
 
       // automation_executions may link to contacts/conversations owned by this
       // channel but have no FK cascade to channel — wipe in one pass via IN.

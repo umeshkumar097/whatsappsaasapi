@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -33,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SiRazorpay, SiMercadopago } from "react-icons/si";
+import { SiMercadopago } from "react-icons/si";
 import { FaCcStripe, FaPaypal } from "react-icons/fa";
 import Header from "@/components/layout/header";
 import { apiRequest } from "@/lib/queryClient";
@@ -50,7 +43,7 @@ import {
 interface PaymentProvider {
   id: string;
   name: string;
-  providerKey: "razorpay" | "stripe" | "paypal" | "paystack" | "mercadopago";
+  providerKey: "cashfree" | "stripe" | "paypal" | "paystack" | "mercadopago";
   description: string;
   logo: string;
   isActive: boolean;
@@ -70,7 +63,7 @@ interface PaymentProvider {
 }
 
 interface PaymentFormData {
-  provider: "razorpay" | "stripe" | "paypal" | "paystack" | "mercadopago";
+  provider: "cashfree" | "stripe" | "paypal" | "paystack" | "mercadopago";
   apiKey: string;
   apiSecret: string;
   apiKeyTest: string;
@@ -99,7 +92,7 @@ export default function GatewaySettings() {
 
   // Payment Gateway Schema with translations
   const paymentGatewaySchema = z.object({
-    provider: z.enum(["razorpay", "stripe", "paypal", "paystack", "mercadopago"], {
+    provider: z.enum(["cashfree", "stripe", "paypal", "paystack", "mercadopago"], {
       required_error: t("gateway.validation.providerRequired"),
     }),
     apiKey: z.string().optional(),
@@ -130,7 +123,7 @@ export default function GatewaySettings() {
   const paymentForm = useForm<PaymentFormData>({
     resolver: zodResolver(paymentGatewaySchema),
     defaultValues: {
-      provider: "razorpay",
+      provider: "cashfree",
       apiKey: "",
       apiSecret: "",
       apiKeyTest: "",
@@ -141,7 +134,7 @@ export default function GatewaySettings() {
       webhookIdTest: "",
       isLive: false,
       isActive: true,
-      supportedCurrencies: PROVIDER_CURRENCY_OPTIONS.razorpay,
+      supportedCurrencies: PROVIDER_CURRENCY_OPTIONS.cashfree,
     },
   });
 
@@ -202,7 +195,7 @@ export default function GatewaySettings() {
   const upsertMutation = useMutation({
     mutationFn: async (data: PaymentFormData) => {
       const payload = {
-        name: { razorpay: "Razorpay", stripe: "Stripe", paypal: "PayPal", paystack: "Paystack", mercadopago: "Mercado Pago" }[data.provider] || data.provider,
+        name: { cashfree: "Cashfree", stripe: "Stripe", paypal: "PayPal", paystack: "Paystack", mercadopago: "Mercado Pago" }[data.provider] || data.provider,
         providerKey: data.provider,
         description: "",
         logo: `${data.provider}.png`,
@@ -314,8 +307,8 @@ export default function GatewaySettings() {
                   </p>
                 </div>
                 <div className="p-3 bg-purple-100 rounded-lg">
-                  {paymentForm.watch("provider") === "razorpay" ? (
-                    <SiRazorpay className="w-6 h-6 text-purple-600" />
+                  {paymentForm.watch("provider") === "cashfree" ? (
+                    <CreditCard className="w-6 h-6 text-purple-600" />
                   ) : paymentForm.watch("provider") === "paypal" ? (
                     <FaPaypal className="w-6 h-6 text-purple-600" />
                   ) : paymentForm.watch("provider") === "mercadopago" ? (
@@ -434,10 +427,10 @@ export default function GatewaySettings() {
                     />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="razorpay">
+                    <SelectItem value="cashfree">
                       <div className="flex items-center gap-2">
-                        <SiRazorpay className="w-4 h-4" />
-                        <span>{t("gateway.form.razorpay")}</span>
+                        <CreditCard className="w-4 h-4" />
+                        <span>{t("gateway.form.cashfree")}</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="stripe">
@@ -533,8 +526,8 @@ export default function GatewaySettings() {
                         {...paymentForm.register("apiKeyTest")}
                         type={showApiKeyTest && !isDemoUser(user?.username) ? "text" : "password"}
                         placeholder={
-                          paymentForm.watch("provider") === "razorpay"
-                            ? t("gateway.form.testApiKeyPlaceholderRazorpay")
+                          paymentForm.watch("provider") === "cashfree"
+                            ? t("gateway.form.testApiKeyPlaceholderCashfree")
                             : paymentForm.watch("provider") === "paypal"
                             ? "PayPal Client ID"
                             : paymentForm.watch("provider") === "paystack"
@@ -790,37 +783,37 @@ export default function GatewaySettings() {
 
 
               {/* Provider Information */}
-              {paymentForm.watch("provider") === "razorpay" && (
+              {paymentForm.watch("provider") === "cashfree" && (
                 <div className="p-4 border rounded-lg bg-blue-50">
                   <div className="space-y-2">
                     <h4 className="font-medium text-blue-900 flex items-center gap-2">
-                      <SiRazorpay className="w-4 h-4" />
-                      {t("gateway.razorpay.title")}
+                      <CreditCard className="w-4 h-4" />
+                      {t("gateway.cashfree.title")}
                     </h4>
                     <p className="text-sm text-blue-800">
-                      {t("gateway.razorpay.description")}
+                      {t("gateway.cashfree.description")}
                     </p>
                     <ul className="text-sm text-blue-800 space-y-1 mt-2">
                       <li>
-                        • {t("gateway.razorpay.testKeyInfo")}{" "}
+                        • {t("gateway.cashfree.testKeyInfo")}{" "}
                         <code className="bg-blue-100 px-1 rounded">
                           rzp_test_
                         </code>
                       </li>
                       <li>
-                        • {t("gateway.razorpay.liveKeyInfo")}{" "}
+                        • {t("gateway.cashfree.liveKeyInfo")}{" "}
                         <code className="bg-blue-100 px-1 rounded">
                           rzp_live_
                         </code>
                       </li>
                     </ul>
                     <a
-                      href="https://dashboard.razorpay.com/app/keys"
+                      href="https://dashboard.cashfree.com/app/keys"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-blue-600 hover:underline inline-block mt-2"
                     >
-                      {t("gateway.razorpay.getKeys")}
+                      {t("gateway.cashfree.getKeys")}
                     </a>
                   </div>
                 </div>
@@ -987,7 +980,99 @@ export default function GatewaySettings() {
             </form>
           </CardContent>
         </Card>
+
+        {/* ── Gupshup Partner Token ─────────────────────────────────── */}
+        <GupshupTokenCard />
       </main>
     </div>
+  );
+}
+
+function GupshupTokenCard() {
+  const { toast } = useToast();
+  const [token, setToken] = useState("");
+  const [show, setShow] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const { data } = useQuery({
+    queryKey: ["/api/platform-settings/gupshup_partner_token"],
+    queryFn: async () => {
+      const res = await fetch("/api/platform-settings", { credentials: "include" });
+      if (!res.ok) return null;
+      const d = await res.json();
+      return d.gupshupPartnerToken || "";
+    },
+  });
+
+  useEffect(() => { if (data) setToken(data); }, [data]);
+
+  const handleSave = async () => {
+    if (!token.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/platform-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ gupshupPartnerToken: token.trim() }),
+      });
+      if (res.ok) {
+        toast({ title: "✅ Gupshup token saved!", description: "New token is now active for embedded signup." });
+      } else {
+        toast({ title: "Error saving token", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Network error", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card className="mt-6 border-purple-200">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <span className="text-purple-600">🔑</span>
+          Gupshup Partner Token
+        </CardTitle>
+        <p className="text-xs text-gray-500">
+          Required for auto-linking new WhatsApp channels to Gupshup. Token expires every ~12 hours.
+          <br />
+          Get it: <strong>partner.gupshup.io</strong> → F12 → Console → <code className="bg-gray-100 px-1 rounded">copy(localStorage.getItem('token'))</code>
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="relative">
+          <textarea
+            rows={3}
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+            placeholder="eyJ0eXAiOiJKV1QiLCJhbGciOi..."
+            className="w-full text-xs font-mono border rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-purple-300"
+            style={{ filter: show ? "none" : "blur(4px)" }}
+          />
+          <button
+            type="button"
+            onClick={() => setShow(!show)}
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-700"
+          >
+            {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+        </div>
+        {token && (
+          <p className="text-xs text-gray-400">
+            Token length: <strong>{token.length}</strong> chars
+            {token.startsWith("eyJ") ? " ✅ Valid JWT format" : " ⚠️ Unexpected format"}
+          </p>
+        )}
+        <Button
+          onClick={handleSave}
+          disabled={saving || !token.trim()}
+          className="bg-purple-600 hover:bg-purple-700"
+        >
+          {saving ? "Saving..." : "Save Gupshup Token"}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

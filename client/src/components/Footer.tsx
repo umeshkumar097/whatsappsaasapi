@@ -1,240 +1,171 @@
-/**
- * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
- *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
- * ============================================================
- */
-
 import React from "react";
 import { Link } from "wouter";
-import {
-  MessageCircle,
-  Twitter,
-  Linkedin,
-  Github,
-  Mail,
-  ArrowRight,
-  MessageSquare,
-} from "lucide-react";
-import { useTranslation } from "@/lib/i18n";
-import { useQuery } from "@tanstack/react-query";
-import { AppSettings } from "@/types/types";
+import { MessageSquare, Twitter, Linkedin, Github, Mail, ArrowRight } from "lucide-react";
 
 const Footer: React.FC = () => {
-  const { t } = useTranslation();
-
-  const { data: brandSettings } = useQuery<AppSettings>({
-    queryKey: ["/api/brand-settings"],
-    queryFn: () => fetch("/api/brand-settings").then((res) => res.json()),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const productLinks = t(
-    "Landing.footerSec.links.product"
-  ) as unknown as string[];
-  const companyLinks = t(
-    "Landing.footerSec.links.company"
-  ) as unknown as string[];
-  const supportLinks = t(
-    "Landing.footerSec.links.support"
-  ) as unknown as string[];
-  const resourcesLinks = t(
-    "Landing.footerSec.links.resources"
-  ) as unknown as string[];
-  const legalLinks = t("Landing.footerSec.links.legal") as unknown as string[];
-
   const links = {
     product: [
-      { name: productLinks[0], href: "/#features" },
-      { name: productLinks[1], href: "/#how-it-works" },
-      { name: productLinks[2], href: "/#use-cases" },
+      { name: "Bulk Messaging", href: "/#features" },
+      { name: "AI Chatbot", href: "/#features" },
+      { name: "Analytics", href: "/#features" },
+      { name: "Automation", href: "/#features" },
     ],
     company: [
-      { name: companyLinks[0], href: "/about" },
-      { name: companyLinks[1], href: "/contact" },
-      { name: companyLinks[2], href: "/careers" },
-    ],
-    support: [
-      { name: supportLinks[0], href: "#" },
-      { name: supportLinks[1], href: "#" },
-      { name: supportLinks[2], href: "#" },
-      { name: supportLinks[3], href: "#" },
+      { name: "About Us", href: "/about" },
+      { name: "Contact", href: "/contact" },
+      { name: "Careers", href: "/careers" },
     ],
     resources: [
-      { name: resourcesLinks[1], href: "/case-studies" },
-      { name: resourcesLinks[2], href: "/whatsapp-guide" },
-      { name: resourcesLinks[3], href: "/best-practices" },
+      { name: "Documentation", href: "#" },
+      { name: "API Reference", href: "#" },
+      { name: "WhatsApp Guide", href: "/whatsapp-guide" },
+      { name: "Case Studies", href: "/case-studies" },
     ],
     legal: [
-      { name: legalLinks[0], href: "/privacy-policy" },
-      { name: legalLinks[1], href: "/terms" },
-      { name: legalLinks[2], href: "/cookie-policy" },
+      { name: "Privacy Policy", href: "/privacy-policy" },
+      { name: "Terms of Service", href: "/terms" },
+      { name: "Cookie Policy", href: "/cookie-policy" },
+      { name: "Data Deletion", href: "/data-deletion" },
     ],
   };
 
-  const renderLink = (link: { name: string; href: string }, index: number) => (
-    <li key={index}>
-      {link.href.startsWith("/") ? (
-        <Link
-          to={link.href}
-          className="text-gray-400 hover:text-white text-sm transition-all duration-200 hover:translate-x-0.5 inline-block"
-        >
-          {link.name}
-        </Link>
-      ) : (
-        <a
-          href={link.href}
-          className="text-gray-400 hover:text-white text-sm transition-all duration-200 hover:translate-x-0.5 inline-block"
-        >
-          {link.name}
-        </a>
-      )}
-    </li>
-  );
-
   return (
-    <footer className="bg-gradient-to-b from-gray-900 to-gray-950 text-white relative">
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
+    <footer style={{ background: "#061510" }} className="text-white relative">
+      {/* Top border gradient */}
+      <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #25d366, transparent)" }} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
+
+          {/* Brand column */}
           <div className="lg:col-span-4">
-            <Link href="/" className="flex items-center space-x-2 sm:space-x-3">
-              {brandSettings?.logo2 && brandSettings.logo2 !== "/uploads/null" ? (
-                <img
-                  src={brandSettings.logo2}
-                  alt="Logo"
-                  className="h-12 object-contain"
-                  style={{ filter: "brightness(0) invert(1)" }}
-                />
-              ) : brandSettings?.logo ? (
-                <img
-                  src={brandSettings.logo}
-                  alt="Logo"
-                  className="h-12 object-contain"
-                  style={{ filter: "brightness(0) invert(1)" }}
-                />
-              ) : (
-                <div className="bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 rounded-xl p-2.5">
-                  <MessageSquare className="h-7 w-7" />
-                </div>
-              )}
+            <Link href="/" className="flex items-center gap-2.5 mb-5">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, #128c7e 0%, #25d366 100%)" }}>
+                <MessageSquare className="h-5 w-5 text-white" />
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="text-xl font-black tracking-tight text-white">Waki</span>
+                <span className="text-[10px] font-semibold tracking-widest uppercase" style={{ color: "#25d366" }}>by Aiclex</span>
+              </div>
             </Link>
-            <p className="text-gray-400 mt-5 mb-8 max-w-sm text-sm leading-relaxed">
-              {t("Landing.footerSec.brandSection.description")}
+
+            <p className="text-sm leading-relaxed mb-6 max-w-xs" style={{ color: "rgba(255,255,255,0.45)" }}>
+              The most powerful WhatsApp marketing platform for growing businesses. Send smarter, automate faster, grow bigger.
             </p>
-            <div className="flex space-x-3">
-              <a
-                href="https://x.com"
-                className="bg-gray-800/60 p-2.5 rounded-xl hover:bg-blue-500/20 border border-gray-700/50 hover:border-blue-500/30 transition-all duration-300 group hover:scale-110"
-                aria-label={t("Landing.footerSec.socialLinks.twitter")}
-              >
-                <Twitter className="w-4 h-4 text-gray-400 group-hover:text-blue-400 transition-colors duration-300" />
-              </a>
-              <a
-                href="https://linkedin.com/"
-                className="bg-gray-800/60 p-2.5 rounded-xl hover:bg-blue-600/20 border border-gray-700/50 hover:border-blue-600/30 transition-all duration-300 group hover:scale-110"
-                aria-label={t("Landing.footerSec.socialLinks.linkedin")}
-              >
-                <Linkedin className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors duration-300" />
-              </a>
-              <a
-                href="https://github.com/"
-                className="bg-gray-800/60 p-2.5 rounded-xl hover:bg-gray-600/20 border border-gray-700/50 hover:border-gray-500/30 transition-all duration-300 group hover:scale-110"
-                aria-label={t("Landing.footerSec.socialLinks.github")}
-              >
-                <Github className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors duration-300" />
-              </a>
-              <a
-                href="https://mail.google.com"
-                className="bg-gray-800/60 p-2.5 rounded-xl hover:bg-emerald-500/20 border border-gray-700/50 hover:border-emerald-500/30 transition-all duration-300 group hover:scale-110"
-                aria-label={t("Landing.footerSec.socialLinks.mail")}
-              >
-                <Mail className="w-4 h-4 text-gray-400 group-hover:text-emerald-400 transition-colors duration-300" />
-              </a>
+
+            {/* Newsletter */}
+            <div className="mb-6">
+              <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "#25d366" }}>Stay Updated</p>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  className="flex-1 px-3 py-2 rounded-lg text-sm outline-none"
+                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }}
+                />
+                <button
+                  className="px-4 py-2 rounded-lg text-sm font-bold transition-all hover:-translate-y-0.5"
+                  style={{ background: "#25d366", color: "#fff" }}
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Socials */}
+            <div className="flex gap-2.5">
+              {[
+                { icon: Twitter, href: "https://twitter.com", label: "Twitter", hoverColor: "#1d9bf0" },
+                { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn", hoverColor: "#0a66c2" },
+                { icon: Github, href: "https://github.com/umeshkumar097", label: "GitHub", hoverColor: "#fff" },
+                { icon: Mail, href: "mailto:info@aiclex.in", label: "Email", hoverColor: "#25d366" },
+              ].map((s, i) => (
+                <a
+                  key={i}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  className="p-2.5 rounded-xl transition-all duration-200 hover:-translate-y-0.5"
+                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
+                >
+                  <s.icon className="w-4 h-4" style={{ color: "rgba(255,255,255,0.5)" }} />
+                </a>
+              ))}
             </div>
           </div>
 
+          {/* Product */}
           <div className="lg:col-span-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300 mb-5">
-              Product
-            </h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: "#25d366" }}>Product</h3>
             <ul className="space-y-3">
-              {links.product.map((link, index) => renderLink(link, index))}
+              {links.product.map((link, i) => (
+                <li key={i}>
+                  <Link href={link.href} className="text-sm transition-all duration-200 hover:translate-x-1 inline-block" style={{ color: "rgba(255,255,255,0.45)" }}>
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
+          {/* Company */}
           <div className="lg:col-span-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300 mb-5">
-              Company
-            </h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: "#25d366" }}>Company</h3>
             <ul className="space-y-3">
-              {links.company.map((link, index) => renderLink(link, index))}
+              {links.company.map((link, i) => (
+                <li key={i}>
+                  <Link href={link.href} className="text-sm transition-all duration-200 hover:translate-x-1 inline-block" style={{ color: "rgba(255,255,255,0.45)" }}>
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
+          {/* Resources */}
           <div className="lg:col-span-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300 mb-5">
-              Resources
-            </h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: "#25d366" }}>Resources</h3>
             <ul className="space-y-3">
-              {links.resources.map((link, index) => renderLink(link, index))}
+              {links.resources.map((link, i) => (
+                <li key={i}>
+                  <a href={link.href} className="text-sm transition-all duration-200 hover:translate-x-1 inline-block" style={{ color: "rgba(255,255,255,0.45)" }}>
+                    {link.name}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
+          {/* Legal */}
           <div className="lg:col-span-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300 mb-5">
-              Legal
-            </h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: "#25d366" }}>Legal</h3>
             <ul className="space-y-3">
-              {links.legal.map((link, index) => renderLink(link, index))}
+              {links.legal.map((link, i) => (
+                <li key={i}>
+                  <Link href={link.href} className="text-sm transition-all duration-200 hover:translate-x-1 inline-block" style={{ color: "rgba(255,255,255,0.45)" }}>
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
       </div>
 
-      <div className="border-t border-gray-800/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-gray-500 text-xs">
-              {t("Landing.footerSec.bottomBar.copyrightText", {
-                appName: brandSettings?.title ?? "",
-              })}
-            </p>
-            <div className="flex items-center space-x-6">
-              <Link
-                to="/terms"
-                className="text-gray-500 hover:text-gray-300 text-xs transition-colors duration-200"
-              >
-                {t("Landing.footerSec.bottomBar.termsLink")}
-              </Link>
-              <Link
-                to="/privacy-policy"
-                className="text-gray-500 hover:text-gray-300 text-xs transition-colors duration-200"
-              >
-                {t("Landing.footerSec.bottomBar.privacyLink")}
-              </Link>
-              <Link
-                to="/cookie-policy"
-                className="text-gray-500 hover:text-gray-300 text-xs transition-colors duration-200"
-              >
-                {t("Landing.footerSec.bottomBar.cookieLink")}
-              </Link>
-            </div>
+      {/* Bottom bar */}
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
+            © {new Date().getFullYear()} Aiclex Solutions Private Limited. All rights reserved. Waki is a product of Aiclex Solutions Pvt. Ltd.
+          </p>
+          <div className="flex items-center gap-2 text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
+            <span>Made with</span>
+            <span style={{ color: "#25d366" }}>♥</span>
+            <span>in India</span>
           </div>
         </div>
       </div>
-
     </footer>
   );
 };

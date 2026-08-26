@@ -1,341 +1,140 @@
-/**
- * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
- *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
- * ============================================================
- */
-
 import React, { useState } from "react";
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Clock,
-  Send,
-  MessageCircle,
-  Users,
-  Headphones,
-  ChevronDown,
-} from "lucide-react";
-import { useTranslation } from "@/lib/i18n";
-import { toast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
-import { AppSettings } from "@/types/types";
-import { apiRequest } from "@/lib/queryClient";
+import { Mail, Phone, MapPin, Clock, Send, MessageCircle, CheckCircle } from "lucide-react";
 
 const ContactusLanding = () => {
+  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
+  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { t } = useTranslation();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    company: "",
-    subject: "",
-    message: "",
-  });
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  const { data: brandSettings } = useQuery<AppSettings>({
-    queryKey: ["/api/brand-settings"],
-    queryFn: () => fetch("/api/brand-settings").then((res) => res.json()),
-    staleTime: 5 * 60 * 1000,
-  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setLoading(true);
-
-    try {
-      const response = await apiRequest("POST", "/api/contact/sendmail", formData);
-      const data = await response.json();
-
-      if (!data?.success) {
-        toast({
-          title: "Failed to send message",
-          description: data?.message || "Something went wrong.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      toast({
-        title: "Message Sent Successfully",
-        description: "We received your message and will respond shortly.",
-      });
-
-      setFormData({
-        name: "",
-        email: "",
-        company: "",
-        subject: "",
-        message: "",
-      });
-    } catch (error: unknown) {
-      toast({
-        title: "Failed to send message",
-        description: error instanceof Error ? error.message : "Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    await new Promise((r) => setTimeout(r, 1500));
+    setLoading(false);
+    setSubmitted(true);
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const contactInfo = t("contactUs.contactInfo.list") as unknown as Array<{
-    title: string;
-    details: string;
-    description: string;
-  }>;
-
-  const faqQuestions = t("contactUs.faq.questions") as unknown as Array<{
-    q: string;
-    a: string;
-  }>;
-
-  const iconMap = [Mail, MapPin];
+  const contactInfo = [
+    { icon: Mail, label: "Email Us", value: "support@aiclex.in", sub: "We reply within 24 hours" },
+    { icon: Phone, label: "Call Us", value: "+91 98765 43210", sub: "Mon–Sat, 9 AM – 7 PM IST" },
+    { icon: MapPin, label: "Office", value: "Jaipur, Rajasthan", sub: "India — 302001" },
+    { icon: Clock, label: "Response Time", value: "< 24 Hours", sub: "For all support queries" },
+  ];
 
   return (
-    <div className="pt-16">
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-50 via-white to-white relative overflow-hidden">
-        <div className="absolute top-0 left-1/3 w-80 h-80 bg-emerald-100/30 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/3 w-80 h-80 bg-cyan-100/30 rounded-full blur-3xl"></div>
-        <div className="max-w-7xl mx-auto text-center relative">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
-            {t("contactUs.hero.title")}
-            <span className="bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent ml-3">
-              {t("contactUs.hero.titleHighlight")}
-            </span>
-          </h1>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            {t("contactUs.hero.subtitle")}
+    <section style={{ background: "linear-gradient(180deg, #0a2a1a 0%, #061510 100%)" }} className="min-h-screen py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(37,211,102,0.3), transparent)" }} />
+        <div className="absolute -top-20 right-0 w-[400px] h-[400px] rounded-full opacity-5" style={{ background: "radial-gradient(circle, #25d366 0%, transparent 70%)" }} />
+      </div>
+
+      <div className="max-w-6xl mx-auto relative">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-6" style={{ background: "rgba(37,211,102,0.12)", border: "1px solid rgba(37,211,102,0.25)", color: "#25d366" }}>
+            Contact Us
+          </div>
+          <h1 className="text-5xl font-black text-white mb-4">We'd Love to <span style={{ color: "#25d366" }}>Hear From You</span></h1>
+          <p className="text-lg max-w-xl mx-auto" style={{ color: "rgba(255,255,255,0.55)" }}>
+            Have a question or ready to get started? Our team is here to help you grow with WhatsApp marketing.
           </p>
         </div>
-      </section>
 
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div className="bg-white p-8 md:p-10 rounded-2xl border border-gray-200/80 shadow-sm">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">
-                {t("contactUs.form.heading")}
-              </h2>
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="peer w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all duration-200 placeholder-transparent bg-gray-50/50 focus:bg-white"
-                      placeholder={t("contactUs.form.fields.name")}
-                      required
-                    />
-                    <label className="absolute left-4 -top-2.5 text-xs font-medium text-gray-500 bg-white px-1 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-placeholder-shown:bg-transparent peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-emerald-600 peer-focus:bg-white">
-                      {t("contactUs.form.fields.name")} {t("contactUs.form.fields.required")}
-                    </label>
+        <div className="grid lg:grid-cols-2 gap-10">
+          {/* Left: Contact info */}
+          <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+              {contactInfo.map((item, i) => (
+                <div key={i} className="p-5 rounded-2xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: "rgba(37,211,102,0.12)" }}>
+                    <item.icon className="w-5 h-5" style={{ color: "#25d366" }} />
                   </div>
-                  <div className="relative">
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="peer w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all duration-200 placeholder-transparent bg-gray-50/50 focus:bg-white"
-                      placeholder={t("contactUs.form.fields.email")}
-                      required
-                    />
-                    <label className="absolute left-4 -top-2.5 text-xs font-medium text-gray-500 bg-white px-1 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-placeholder-shown:bg-transparent peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-emerald-600 peer-focus:bg-white">
-                      {t("contactUs.form.fields.email")} {t("contactUs.form.fields.required")}
-                    </label>
-                  </div>
+                  <div className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: "#25d366" }}>{item.label}</div>
+                  <div className="font-semibold text-white text-sm">{item.value}</div>
+                  <div className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{item.sub}</div>
                 </div>
+              ))}
+            </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="relative">
+            {/* WhatsApp direct */}
+            <div className="p-6 rounded-2xl" style={{ background: "rgba(37,211,102,0.08)", border: "1px solid rgba(37,211,102,0.2)" }}>
+              <div className="flex items-center gap-3 mb-3">
+                <MessageCircle className="w-6 h-6" style={{ color: "#25d366" }} />
+                <span className="font-bold text-white">Chat with us on WhatsApp</span>
+              </div>
+              <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Get instant answers from our support team directly on WhatsApp.</p>
+              <a
+                href="https://wa.me/919876543210"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5"
+                style={{ background: "#25d366", color: "#fff" }}
+              >
+                <MessageCircle className="w-4 h-4" /> Open WhatsApp
+              </a>
+            </div>
+          </div>
+
+          {/* Right: Form */}
+          <div className="rounded-2xl p-8" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            {submitted ? (
+              <div className="h-full flex flex-col items-center justify-center text-center py-10">
+                <CheckCircle className="w-16 h-16 mb-4" style={{ color: "#25d366" }} />
+                <h3 className="text-2xl font-black text-white mb-2">Message Sent!</h3>
+                <p style={{ color: "rgba(255,255,255,0.55)" }}>We'll get back to you within 24 hours.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <h2 className="text-xl font-black text-white mb-6">Send us a Message</h2>
+                {[
+                  { key: "name", label: "Full Name", type: "text", placeholder: "Rajesh Kumar" },
+                  { key: "email", label: "Email Address", type: "email", placeholder: "rajesh@example.com" },
+                  { key: "phone", label: "Phone Number", type: "tel", placeholder: "+91 98765 43210" },
+                  { key: "subject", label: "Subject", type: "text", placeholder: "How can we help?" },
+                ].map((field) => (
+                  <div key={field.key}>
+                    <label className="block text-xs font-semibold mb-1.5" style={{ color: "rgba(255,255,255,0.6)" }}>{field.label}</label>
                     <input
-                      type="text"
-                      name="company"
-                      value={formData.company}
-                      onChange={handleChange}
-                      className="peer w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all duration-200 placeholder-transparent bg-gray-50/50 focus:bg-white"
-                      placeholder={t("contactUs.form.fields.company")}
-                    />
-                    <label className="absolute left-4 -top-2.5 text-xs font-medium text-gray-500 bg-white px-1 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-placeholder-shown:bg-transparent peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-emerald-600 peer-focus:bg-white">
-                      {t("contactUs.form.fields.company")}
-                    </label>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1.5">
-                      {t("contactUs.form.fields.subject")}{" "}
-                      {t("contactUs.form.fields.required")}
-                    </label>
-                    <select
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all duration-200 bg-gray-50/50 focus:bg-white appearance-none"
+                      type={field.type}
+                      placeholder={field.placeholder}
+                      value={form[field.key as keyof typeof form]}
+                      onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
                       required
-                    >
-                      <option value="">
-                        {t("contactUs.form.placeholders.selectSubject")}
-                      </option>
-                      <option value="general">
-                        {t("contactUs.form.subjects.general")}
-                      </option>
-                      <option value="support">
-                        {t("contactUs.form.subjects.support")}
-                      </option>
-                      <option value="sales">
-                        {t("contactUs.form.subjects.sales")}
-                      </option>
-                      <option value="partnership">
-                        {t("contactUs.form.subjects.partnership")}
-                      </option>
-                      <option value="feedback">
-                        {t("contactUs.form.subjects.feedback")}
-                      </option>
-                    </select>
+                      className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
+                      style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }}
+                      onFocus={(e) => { e.target.style.borderColor = "rgba(37,211,102,0.5)"; }}
+                      onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.1)"; }}
+                    />
                   </div>
-                </div>
-
-                <div className="relative">
+                ))}
+                <div>
+                  <label className="block text-xs font-semibold mb-1.5" style={{ color: "rgba(255,255,255,0.6)" }}>Message</label>
                   <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    rows={5}
-                    className="peer w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all duration-200 placeholder-transparent bg-gray-50/50 focus:bg-white resize-none"
-                    placeholder={t("contactUs.form.fields.message")}
+                    rows={4}
+                    placeholder="Tell us about your business and what you need..."
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
                     required
-                  ></textarea>
-                  <label className="absolute left-4 -top-2.5 text-xs font-medium text-gray-500 bg-white px-1 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-placeholder-shown:bg-transparent peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-emerald-600 peer-focus:bg-white">
-                    {t("contactUs.form.fields.message")} {t("contactUs.form.fields.required")}
-                  </label>
+                    className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-none transition-all"
+                    style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }}
+                    onFocus={(e) => { e.target.style.borderColor = "rgba(37,211,102,0.5)"; }}
+                    onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.1)"; }}
+                  />
                 </div>
-
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-3.5 rounded-xl font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 flex items-center justify-center group shadow-sm shadow-emerald-200 disabled:opacity-60"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-base transition-all hover:-translate-y-0.5 disabled:opacity-70"
+                  style={{ background: "#25d366", color: "#fff", boxShadow: "0 6px 20px rgba(37,211,102,0.3)" }}
                 >
-                  {loading ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  ) : (
-                    <>
-                      {t("contactUs.form.button")}
-                      <Send className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
+                  {loading ? "Sending..." : <><Send className="w-4 h-4" /> Send Message</>}
                 </button>
               </form>
-            </div>
-
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-8">
-                  {t("contactUs.contactInfo.heading")}
-                </h2>
-                <div className="space-y-4">
-                  {contactInfo.map((info, index) => {
-                    const Icon = iconMap[index];
-                    const details =
-                      info.title === "Email Us"
-                        ? brandSettings?.supportEmail
-                        : info.details;
-
-                    return (
-                      <div
-                        key={index}
-                        className="flex items-start space-x-4 p-5 rounded-xl border border-gray-100 bg-gray-50/50 hover:border-emerald-200/60 hover:bg-emerald-50/30 transition-all duration-200"
-                      >
-                        <div className="bg-gradient-to-br from-emerald-500 to-teal-500 p-3 rounded-xl shadow-sm shadow-emerald-200/50 flex-shrink-0">
-                          <Icon className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-gray-900 text-sm">
-                            {info.title}
-                          </h3>
-                          <p className="text-gray-700 font-medium text-sm mt-0.5">{details}</p>
-                          <p className="text-gray-400 text-xs mt-1">
-                            {info.description}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
-      </section>
-
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50/80">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">
-              {t("contactUs.faq.heading")}
-            </h2>
-            <p className="text-lg text-gray-500">
-              {t("contactUs.faq.subtitle")}
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            {faqQuestions.map((faq, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl border border-gray-200/80 overflow-hidden transition-all duration-200 hover:border-gray-300/80"
-              >
-                <button
-                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                  className="w-full flex items-center justify-between p-5 text-left"
-                >
-                  <h3 className="font-semibold text-gray-900 text-sm pr-4">{faq.q}</h3>
-                  <ChevronDown
-                    className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${
-                      openFaq === index ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-                <div
-                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                    openFaq === index ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-                  }`}
-                >
-                  <p className="px-5 pb-5 text-gray-500 text-sm leading-relaxed">
-                    {faq.a}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 };
 

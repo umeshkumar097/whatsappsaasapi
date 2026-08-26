@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { useState, useCallback } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -33,7 +26,6 @@ import {
   Phone,
   Mail,
   Building,
-  HelpCircle,
   Lightbulb,
 } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
@@ -791,42 +783,47 @@ const MessageItem = ({
 
       case "unsupported": {
         const meta = message.metadata as any;
-        const errorTitle = meta?.errorTitle;
-        const originalType = meta?.originalType;
+        const subType = meta?.unsupportedSubType || "unknown";
         const errorCode = meta?.errorCode;
-        const errorDetails = meta?.errorDetails;
-        const rawWebhook = meta?.rawWebhook;
+
+        // Human-friendly label per sub-type
+        const subTypeLabels: Record<string, { icon: string; text: string }> = {
+          poll_creation:     { icon: "🗳️", text: "User sent a Poll" },
+          group_invite:      { icon: "👥", text: "User sent a Group Invite" },
+          location:          { icon: "📍", text: "User shared a Location" },
+          pin:               { icon: "📌", text: "User pinned a message" },
+          keep_in_chat:      { icon: "💾", text: "User saved a message" },
+          link_preview:      { icon: "🔗", text: "User sent a Link" },
+          media_placeholder: { icon: "📎", text: "User sent a Media file" },
+          hsm:               { icon: "📋", text: "User sent a Template" },
+          list:              { icon: "📝", text: "User sent a List message" },
+          product:           { icon: "🛍️", text: "User sent a Product" },
+          order:             { icon: "🛒", text: "User sent an Order" },
+          gif:               { icon: "🎬", text: "User sent a GIF" },
+          image:             { icon: "🖼️", text: "User sent an Image" },
+          reaction:          { icon: "👍", text: "User sent a Reaction" },
+          interactive:       { icon: "🔘", text: "User sent an Interactive message" },
+          edit:              { icon: "✏️", text: "User edited a message" },
+          first_time_user:   { icon: "👋", text: "New user joined" },
+          errors:            { icon: "⚠️", text: "Message could not be delivered" },
+          unknown:           { icon: "📨", text: "User sent an unsupported message" },
+        };
+
+        const label = subTypeLabels[subType] ?? { icon: "📨", text: "User sent an unsupported message" };
+
         return (
           <div className={cn(
-            "flex flex-col gap-1 p-2 rounded-lg text-sm",
-            isOutbound ? "bg-[#c5e8b0]" : "bg-gray-50"
+            "flex flex-col gap-1 px-3 py-2 rounded-lg text-sm max-w-xs",
+            isOutbound ? "bg-[#c5e8b0]" : "bg-gray-100"
           )}>
-            <div className="flex items-center gap-2">
-              <HelpCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              <span className="text-gray-500">
-                {errorTitle || "This message type is not supported by WhatsApp API"}
-              </span>
+            <div className="flex items-center gap-2 text-gray-500">
+              <span className="text-base leading-none">{label.icon}</span>
+              <span className="italic">{label.text}</span>
             </div>
-            {(originalType || errorCode || errorDetails) && (
-              <div className="text-xs text-gray-400 pl-6 space-y-0.5">
-                {originalType && originalType !== "unsupported" && (
-                  <p>Type: <span className="font-medium text-gray-500">{originalType}</span></p>
-                )}
-                {errorCode && (
-                  <p>Error code: <span className="font-medium text-gray-500">{errorCode}</span></p>
-                )}
-                {errorDetails && (
-                  <p>Details: <span className="font-medium text-gray-500">{errorDetails}</span></p>
-                )}
-              </div>
-            )}
-            {rawWebhook && (
-              <details className="text-xs text-gray-400 pl-6 mt-1">
-                <summary className="cursor-pointer hover:text-gray-600">View raw webhook data</summary>
-                <pre className="mt-1 bg-white/60 p-2 rounded text-[10px] overflow-x-auto max-h-32 border">
-                  {JSON.stringify(rawWebhook, null, 2)}
-                </pre>
-              </details>
+            {errorCode && errorCode !== 131060 && (
+              <p className="text-[10px] text-gray-400 pl-6">
+                Auto-reply sent · Code {errorCode}
+              </p>
             )}
           </div>
         );

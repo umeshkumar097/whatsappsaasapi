@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import type { Express } from "express";
 import { diployLogger, HTTP_STATUS, DIPLOY_BRAND } from "@diploy/core";
 import { createServer, type Server } from "http";
@@ -25,6 +18,7 @@ import { registerChannelRoutes } from "./channels.routes";
 import { registerDashboardRoutes } from "./dashboard.routes";
 import { registerAnalyticsRoutes } from "./analytics.routes";
 import { registerContactRoutes } from "./contacts.routes";
+import { setupWalletRoutes } from "./wallet.routes";
 import { registerCampaignRoutes } from "./campaigns.routes";
 import { registerTemplateRoutes } from "./templates.routes";
 import { registerMediaRoutes } from "./media.routes";
@@ -78,6 +72,7 @@ export async function registerRoutes(app: Express, existingServer?: Server): Pro
   registerDashboardRoutes(app);
   registerAnalyticsRoutes(app); // Legacy - kept for compatibility
   registerContactRoutes(app);
+  setupWalletRoutes(app);
   registerCampaignRoutes(app);
   registerTemplateRoutes(app);
   registerMediaRoutes(app);

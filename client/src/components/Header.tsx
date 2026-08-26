@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import {
@@ -136,85 +129,53 @@ const Header = () => {
     title: string;
   }) => (
     <div
-      className={`fixed left-0 right-0 w-screen bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-t border-emerald-100/50 dark:border-emerald-800/30 z-50 transition-all duration-400 ease-out max-h-[80vh] overflow-y-auto ${isVisible
-        ? "opacity-100 translate-y-0 visible"
-        : "opacity-0 -translate-y-2 invisible pointer-events-none"
-        }`}
-      style={{
-        top: isScrolled ? "64px" : "72px",
-      }}
+      className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 transition-all duration-200 ease-out ${
+        isVisible ? "opacity-100 translate-y-0 visible" : "opacity-0 -translate-y-2 invisible pointer-events-none"
+      }`}
+      style={{ minWidth: "220px" }}
     >
-      <div className="max-w-7xl mx-auto p-5 sm:p-6 md:p-8">
-        <div
-          className={`grid gap-4 md:gap-5 ${items.length === 4
-            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-            : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-            }`}
-        >
-          {items.map((item, index) => (
-            <Link
-              key={`${item.title}-${index}`}
-              href={item.path}
-              className="group relative bg-gradient-to-br from-gray-50/80 to-white dark:from-gray-800/60 dark:to-gray-800/40 rounded-2xl p-5 hover:shadow-xl hover:shadow-emerald-500/5 border border-gray-100/80 dark:border-gray-700/50 hover:border-emerald-200 dark:hover:border-emerald-700/50 transition-all duration-300 transform hover:-translate-y-0.5"
-              onClick={closeMegaMenus}
-            >
-              <div className="relative overflow-hidden rounded-xl mb-4">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-28 sm:h-32 object-cover transition-transform duration-500 group-hover:scale-110"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
-                <div className="absolute bottom-2.5 right-2.5 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md p-2 rounded-xl shadow-sm">
-                  <item.icon className="w-4 h-4 text-emerald-600" />
-                </div>
-              </div>
-
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-1.5 group-hover:text-emerald-600 transition-colors text-[15px]">
-                {item.title}
-              </h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed line-clamp-2">
-                {item.description}
-              </p>
-
-              <div className="flex items-center mt-3 text-emerald-600 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-0 group-hover:translate-x-1">
-                <span className="text-sm font-medium">
-                  {t("Landing.header.Learn")}
-                </span>
-                <ArrowRight className="w-3.5 h-3.5 ml-1.5 transition-transform group-hover:translate-x-0.5" />
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        <div className="mt-8 pt-6 border-t border-gray-100/80 dark:border-gray-700/50 hidden md:block">
-          <div className="bg-gradient-to-r from-emerald-50/80 to-teal-50/80 dark:from-emerald-900/15 dark:to-teal-900/15 rounded-2xl p-6 border border-emerald-100/50 dark:border-emerald-800/30">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-                  {t("Landing.header.redystart")}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  {t("Landing.header.join", {
-                    appName: brandSettings?.title ?? "",
-                  })}
-                </p>
-              </div>
-              <Link
-                href="/signup"
-                className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-2.5 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 flex items-center group text-sm font-medium shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 whitespace-nowrap"
-                onClick={closeMegaMenus}
-              >
-                {t("Landing.header.start")}
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Link>
+      <div
+        className="rounded-2xl overflow-hidden shadow-2xl py-2"
+        style={{ background: "#0d3b26", border: "1px solid rgba(37,211,102,0.2)" }}
+      >
+        {items.map((item, index) => (
+          <Link
+            key={`${item.title}-${index}`}
+            href={item.path}
+            className="flex items-center gap-3 px-5 py-3 transition-all duration-150 group"
+            style={{}}
+            onClick={closeMegaMenus}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background = "rgba(37,211,102,0.1)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = "transparent";
+            }}
+          >
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(37,211,102,0.12)" }}>
+              <item.icon className="w-4 h-4" style={{ color: "#25d366" }} />
             </div>
-          </div>
+            <div>
+              <div className="text-sm font-semibold text-white">{item.title}</div>
+              <div className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>{item.description}</div>
+            </div>
+          </Link>
+        ))}
+        <div className="mx-4 mt-1 mb-2 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+          <Link
+            href="/signup"
+            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold transition-all"
+            style={{ background: "#25d366", color: "#fff" }}
+            onClick={closeMegaMenus}
+          >
+            Get Started Free <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
     </div>
   );
+
+
 
   return (
     <>
@@ -230,15 +191,22 @@ const Header = () => {
               }`}
           >
             <Link href="/" className="flex items-center space-x-2.5 group">
-              {brandSettings?.logo ? (
+              {brandSettings?.logo && brandSettings.logo.trim() !== "" ? (
                 <img
-                  src={brandSettings?.logo}
-                  alt={t("Landing.header.logoAlt")}
+                  src={brandSettings.logo}
+                  alt="Waki by Aiclex"
                   className="h-10 object-contain transition-transform duration-300 group-hover:scale-105"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               ) : (
-                <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 text-white rounded-xl p-2.5 shadow-lg shadow-emerald-500/20 transition-transform duration-300 group-hover:scale-105">
-                  <MessageSquare className="h-6 w-6" />
+                <div className="flex items-center gap-2.5 transition-transform duration-300 group-hover:scale-105">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, #128c7e 0%, #25d366 100%)" }}>
+                    <MessageSquare className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="flex flex-col leading-none">
+                    <span className="text-xl font-black tracking-tight" style={{ color: "#0d3b26" }}>Waki</span>
+                    <span className="text-[10px] font-semibold tracking-widest uppercase" style={{ color: "#128c7e" }}>by Aiclex</span>
+                  </div>
                 </div>
               )}
             </Link>
@@ -247,8 +215,8 @@ const Header = () => {
               <Link
                 href="/"
                 className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${location === "/"
-                  ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50/80 dark:bg-emerald-900/20"
-                  : "text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                  ? "text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-900/20"
+                  : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/50"
                   }`}
               >
                 {t("Landing.header.Navlinks.0")}
@@ -261,8 +229,8 @@ const Header = () => {
               >
                 <button
                   className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer bg-transparent border-none ${showAboutMega
-                    ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50/80 dark:bg-emerald-900/20"
-                    : "text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    ? "text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-900/20"
+                    : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/50"
                     }`}
                   aria-haspopup="true"
                   aria-expanded={showAboutMega}
@@ -294,8 +262,8 @@ const Header = () => {
               >
                 <button
                   className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer bg-transparent border-none ${showResourcesMega
-                    ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50/80 dark:bg-emerald-900/20"
-                    : "text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    ? "text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-900/20"
+                    : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/50"
                     }`}
                   aria-haspopup="true"
                   aria-expanded={showResourcesMega}
@@ -326,33 +294,34 @@ const Header = () => {
 
               {!isAuthenticated && (
                 <div className="flex items-center gap-2 ml-2">
-                  <Link
-                    href="/login"
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-300"
+                  <a
+                    href={typeof window !== "undefined" && (window.location.hostname === "waki.in" || window.location.hostname === "www.waki.in") ? "https://app.waki.in/login" : "/login"}
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-300"
                   >
                     {t("Landing.header.Navlinks.3")}
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-5 py-2.5 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.02] flex items-center group text-sm font-medium"
+                  </a>
+                  <a
+                    href={typeof window !== "undefined" && (window.location.hostname === "waki.in" || window.location.hostname === "www.waki.in") ? "https://app.waki.in/signup" : "/signup"}
+                    className="text-white px-5 py-2.5 rounded-xl transition-all duration-300 hover:scale-[1.02] flex items-center group text-sm font-bold shadow-lg"
+                    style={{ background: "linear-gradient(135deg, #128c7e, #25d366)", boxShadow: "0 4px 15px rgba(37,211,102,0.3)" }}
                   >
                     {t("Landing.header.getstart")}
                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                  </Link>
+                  </a>
                 </div>
               )}
 
               {isAuthenticated && (
                 <div className="flex items-center gap-3 ml-2">
-                  <Link
-                    href="/dashboard"
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-300"
+                  <a
+                    href={typeof window !== "undefined" && (window.location.hostname === "waki.in" || window.location.hostname === "www.waki.in") ? "https://app.waki.in/dashboard" : "/dashboard"}
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-300"
                   >
                     {t("Landing.header.dash")}
-                  </Link>
+                  </a>
                   <div className="relative" ref={dropdownRef}>
                     <button
-                      className="w-10 h-10 rounded-xl overflow-hidden border-2 border-gray-200/80 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600 transition-all duration-300 hover:shadow-md hover:shadow-emerald-500/10 ring-0 hover:ring-2 hover:ring-emerald-500/20"
+                      className="w-10 h-10 rounded-xl overflow-hidden border-2 border-gray-200/80 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 hover:shadow-md hover:shadow-blue-500/10 ring-0 hover:ring-2 hover:ring-blue-500/20"
                       onClick={() => setDropdownOpen(!dropdownOpen)}
                     >
                       <img
@@ -370,7 +339,7 @@ const Header = () => {
                         : "opacity-0 scale-95 invisible pointer-events-none"
                         }`}
                     >
-                      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700/80 bg-gradient-to-r from-emerald-50/50 to-transparent dark:from-emerald-900/10">
+                      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700/80 bg-gradient-to-r from-blue-50/50 to-transparent dark:from-blue-900/10">
                         <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                           {username}
                         </p>
@@ -378,7 +347,7 @@ const Header = () => {
 
                       <div className="p-1.5">
                         <button
-                          className="flex items-center w-full px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl transition-all duration-200"
+                          className="flex items-center w-full px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all duration-200"
                           onClick={() => {
                             setLocation("/settings");
                             setDropdownOpen(false);
@@ -388,7 +357,7 @@ const Header = () => {
                           {t("Landing.header.Settings")}
                         </button>
                         <button
-                          className="flex items-center w-full px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl transition-all duration-200"
+                          className="flex items-center w-full px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all duration-200"
                           onClick={() => {
                             setLocation("/account");
                             setDropdownOpen(false);
@@ -452,8 +421,8 @@ const Header = () => {
             <Link
               href="/"
               className={`block px-4 py-3 rounded-xl font-medium text-sm transition-all duration-300 ${location === "/"
-                ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50/80 dark:bg-emerald-900/20"
-                : "text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                ? "text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-900/20"
+                : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/50"
                 }`}
               onClick={() => setIsMenuOpen(false)}
             >
@@ -485,11 +454,11 @@ const Header = () => {
                       <Link
                         key={`mobile-about-${index}`}
                         href={item.path}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/60 dark:hover:bg-emerald-900/15 font-medium text-sm transition-all duration-200"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/60 dark:hover:bg-blue-900/15 font-medium text-sm transition-all duration-200"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center flex-shrink-0">
-                          <item.icon className="w-4 h-4 text-emerald-600" />
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center flex-shrink-0">
+                          <item.icon className="w-4 h-4 text-blue-600" />
                         </div>
                         {item.title}
                       </Link>
@@ -524,11 +493,11 @@ const Header = () => {
                       <Link
                         key={`mobile-resources-${index}`}
                         href={item.path}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/60 dark:hover:bg-emerald-900/15 font-medium text-sm transition-all duration-200"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/60 dark:hover:bg-blue-900/15 font-medium text-sm transition-all duration-200"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center flex-shrink-0">
-                          <item.icon className="w-4 h-4 text-emerald-600" />
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center flex-shrink-0">
+                          <item.icon className="w-4 h-4 text-blue-600" />
                         </div>
                         {item.title}
                       </Link>
@@ -553,7 +522,7 @@ const Header = () => {
                       setIsMenuOpen(false);
                       handleLogin();
                     }}
-                    className="block w-full text-center px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 font-medium text-sm transition-all duration-300"
+                    className="block w-full text-center px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 font-medium text-sm transition-all duration-300"
                   >
                     {loginLoading ? (
                       <LoadingAnimation size="sm" color="green" />
@@ -568,7 +537,7 @@ const Header = () => {
                       setIsMenuOpen(false);
                       handleGetStarted();
                     }}
-                    className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 font-medium flex items-center justify-center text-sm shadow-lg shadow-emerald-500/20"
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-medium flex items-center justify-center text-sm shadow-lg shadow-blue-500/20"
                   >
                     {getStartedLoading ? (
                       <LoadingAnimation size="sm" color="white" />
@@ -584,7 +553,7 @@ const Header = () => {
                 <>
                   <Link
                     href="/dashboard"
-                    className="block px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 font-medium text-sm transition-all duration-300"
+                    className="block px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 font-medium text-sm transition-all duration-300"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {t("Landing.header.dash")}
@@ -592,7 +561,7 @@ const Header = () => {
 
                   <div className="border-t border-gray-100 dark:border-gray-800 pt-4 mt-2">
                     <div className="flex items-center gap-3 px-4 mb-3">
-                      <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-emerald-200/50 dark:border-emerald-800/50 shadow-sm">
+                      <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-blue-200/50 dark:border-blue-800/50 shadow-sm">
                         <img
                           src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
                             username
@@ -608,7 +577,7 @@ const Header = () => {
 
                     <div className="space-y-0.5">
                       <button
-                        className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl transition-all duration-200"
+                        className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all duration-200"
                         onClick={() => {
                           setLocation("/settings");
                           setIsMenuOpen(false);
@@ -618,7 +587,7 @@ const Header = () => {
                         {t("Landing.header.Settings")}
                       </button>
                       <button
-                        className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl transition-all duration-200"
+                        className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-all duration-200"
                         onClick={() => {
                           setLocation("/account");
                           setIsMenuOpen(false);

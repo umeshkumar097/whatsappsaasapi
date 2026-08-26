@@ -2133,7 +2133,7 @@
     "form": {
       "providerLabel": "Fournisseur de paiement *",
       "selectProvider": "Sélectionner un fournisseur",
-      "razorpay": "Razorpay",
+      "cashfree": "Cashfree",
       "stripe": "Stripe",
       "environmentLabel": "Mode d'environnement *",
       "testMode": "Mode Test",
@@ -2143,12 +2143,12 @@
       "testCredentials": "Identifiants de test",
       "liveCredentials": "Identifiants directs",
       "testApiKey": "Clé API de test *",
-      "testApiKeyPlaceholderRazorpay": "rzp_test_xxxxxxxxxxxxx",
+      "testApiKeyPlaceholderCashfree": "rzp_test_xxxxxxxxxxxxx",
       "testApiKeyPlaceholderStripe": "pk_test_xxxxxxxxxxxxx",
       "testApiSecret": "Secret API de test *",
       "testApiSecretPlaceholder": "Entrez la clé secrète de test",
       "liveApiKey": "Clé API directe *",
-      "liveApiKeyPlaceholderRazorpay": "rzp_live_xxxxxxxxxxxxx",
+      "liveApiKeyPlaceholderCashfree": "rzp_live_xxxxxxxxxxxxx",
       "liveApiKeyPlaceholderStripe": "pk_live_xxxxxxxxxxxxx",
       "liveApiSecret": "Secret API direct *",
       "liveApiSecretPlaceholder": "Entrez la clé secrète directe",
@@ -2158,12 +2158,12 @@
       "updateSettings": "Mettre à jour les paramètres",
       "saveSettings": "Enregistrer les paramètres"
     },
-    "razorpay": {
-      "title": "Configuration Razorpay",
-      "description": "Obtenez vos identifiants Razorpay depuis le tableau de bord Razorpay. Vous aurez besoin à la fois des identifiants de Test et Direct.",
+    "cashfree": {
+      "title": "Configuration Cashfree",
+      "description": "Obtenez vos identifiants Cashfree depuis le tableau de bord Cashfree. Vous aurez besoin à la fois des identifiants de Test et Direct.",
       "testKeyInfo": "Les clés de test commencent par",
       "liveKeyInfo": "Les clés directes commencent par",
-      "getKeys": "Obtenir les clés API Razorpay →"
+      "getKeys": "Obtenir les clés API Cashfree →"
     },
     "stripe": {
       "title": "Configuration Stripe",
@@ -3913,7 +3913,7 @@
       },
       "documentation": {
         "title": "Documentation de l'API",
-        "description": "Apprenez à utiliser l'API WhatsWay",
+        "description": "Apprenez à utiliser l'API Aiclex Technologies",
         "baseUrl": "URL de Base",
         "authentication": "Authentification",
         "authDesc": "Incluez votre clé API dans l'en-tête d'autorisation :",

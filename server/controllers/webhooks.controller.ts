@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import type { Request, Response } from "express";
 import { DiployError, asyncHandler as _dHandler, diployLogger, HTTP_STATUS } from "@diploy/core";
 import { storage } from "../storage";
@@ -46,7 +39,7 @@ import { users } from "@shared/schema";
 import axios from "axios";
 import {
   getStripe,
-  getRazorpay,
+  getCashfree,
   getPayPalAccessToken,
   getPayPalBaseUrl,
   getMercadoPagoAccessToken,
@@ -890,7 +883,7 @@ async function handleMessageChange(value: any) {
         contactPhone: from,
         contactName: contact.name || from,
         channelId: channel.id,
-        unreadCount: 1,
+        unreadCount: type === "unsupported" ? 0 : 1,
         lastIncomingMessageAt: new Date(),
         lastMessageText: messageContent,
         lastMessageAt: new Date(),
@@ -898,7 +891,10 @@ async function handleMessageChange(value: any) {
 
     } else {
       const updates: any = {
-        unreadCount: (conversation.unreadCount || 0) + 1,
+        // Don't increment unreadCount for unsupported msgs — nothing to reply to
+        unreadCount: type === "unsupported"
+          ? (conversation.unreadCount || 0)
+          : (conversation.unreadCount || 0) + 1,
         lastMessageAt: new Date(),
         lastIncomingMessageAt: new Date(),
         lastMessageText: messageContent,
@@ -2178,102 +2174,79 @@ export const cleanupExpiredExecutions = asyncHandler(
 
 
 
-// Razorpay Webhook Handler
-export const razorpayWebhook = async (req: Request, res: Response) => {
-  let dedupKey: string | null = null;
+// Cashfree Webhook Handler
+export const cashfreeWebhook = async (req: Request, res: Response) => {
   try {
-    const provider = await db
-      .select()
-      .from(paymentProviders)
-      .where(and(eq(paymentProviders.providerKey, "razorpay"), eq(paymentProviders.isActive, true)))
-      .limit(1);
-
-    const isLive = provider[0]?.config?.isLive === true;
-    const webhookSecret = isLive
-      ? provider[0]?.config?.webhookSecret
-      : provider[0]?.config?.webhookSecretTest;
-    if (!webhookSecret) {
-      return res.status(400).json({
-        success: false,
-        message: `Razorpay ${isLive ? 'live' : 'test'} webhook secret not configured`,
-      });
-    }
-    const signature = req.headers['x-razorpay-signature'] as string;
-
-    const rawBody = Buffer.isBuffer(req.body) ? req.body : Buffer.from(JSON.stringify(req.body));
-
-    const expectedSignature = crypto
-      .createHmac('sha256', webhookSecret)
-      .update(rawBody)
-      .digest('hex');
-
-    if (signature !== expectedSignature) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid webhook signature'
-      });
+    const payload = req.body;
+    console.log("Cashfree Webhook Payload:", JSON.stringify(payload, null, 2));
+    const eventType = payload.type;
+    
+    // ----------------------------------------------------
+    // WALLET RECHARGE ORDER PAYMENTS
+    // ----------------------------------------------------
+    if (eventType === "PAYMENT_SUCCESS_WEBHOOK" && payload.data?.order?.order_id?.startsWith("wallet_tx_")) {
+      const order_id = payload.data.order.order_id;
+      
+      const txUUID = order_id.replace("wallet_tx_", ""); const [tx] = await db.select().from(walletTransactions).where(eq(walletTransactions.id, txUUID));
+      
+      if (tx && tx.status !== "completed") {
+        const wallet = await db.query.wallets.findFirst({ where: eq(wallets.id, tx.walletId) });
+        if (wallet) {
+          const newBalance = (parseFloat(wallet.balance as string) + parseFloat(tx.amount as string)).toFixed(4);
+          await db.update(wallets).set({ balance: newBalance }).where(eq(wallets.id, wallet.id));
+          await db.update(walletTransactions).set({ status: "completed" }).where(eq(walletTransactions.id, tx.id));
+          console.log(`Cashfree Webhook: Credited wallet for ${order_id}`);
+        }
+      }
+      return res.json({ received: true });
     }
 
-    const event = Buffer.isBuffer(req.body) ? JSON.parse(req.body.toString()) : req.body;
-    const eventType = event.event;
+    // ----------------------------------------------------
+    // SUBSCRIPTION PAYMENTS
+    // ----------------------------------------------------
 
-    const razorpayEventId =
-      (req.headers['x-razorpay-event-id'] as string | undefined) ||
-      event.payload?.payment?.entity?.id ||
-      event.payload?.subscription?.entity?.id ||
-      event.payload?.order?.entity?.id ||
-      event.payload?.refund?.entity?.id;
-    if (razorpayEventId) {
-      dedupKey = `pay:razorpay:${eventType}:${razorpayEventId}`;
-      if (await _isAlreadyProcessed(dedupKey, PAYMENT_DEDUP_TTL_SEC)) {
-        console.log(`[Webhook Dedup] Skipping duplicate razorpay event: ${dedupKey}`);
-        return res.status(200).json({ success: true, duplicate: true });
+    const sub = payload.data?.subscription || payload.data || payload;
+    const subId = sub.cf_subscription_id || sub.subReferenceId || sub.subscription_id;
+    if (!subId) return res.json({ received: true });
+
+    let existingSub = await db.select().from(subscriptions).where(eq(subscriptions.gatewaySubscriptionId, String(subId))).limit(1);
+    if (!existingSub.length && sub.subscription_id) {
+        existingSub = await db.select().from(subscriptions).where(eq(subscriptions.gatewaySubscriptionId, String(sub.subscription_id))).limit(1);
+    }
+    
+    if (!existingSub.length) {
+      // Find the pending transaction instead
+      const txData = await db.select().from(transactions).where(eq(transactions.providerTransactionId, String(sub.subscription_id))).limit(1);
+      if (txData.length > 0) {
+        if (eventType === "SUBSCRIPTION_ACTIVE" || eventType === "SUBSCRIPTION_PAYMENT_SUCCESS") {
+          await db.update(transactions).set({ status: "completed", paidAt: new Date() }).where(eq(transactions.id, txData[0].id));
+          await activateSubscriptionFromTransaction(txData[0], String(sub.subscription_id), "cashfree");
+        }
+        return res.json({ status: "ok" });
+      } else {
+        return res.json({ received: true });
       }
     }
+    
+    const subscription = existingSub[0];
 
-    console.log('Razorpay Webhook Event:', eventType);
-
-    switch (eventType) {
-      case 'payment.authorized':
-        await handleRazorpayPaymentAuthorized(event);
-        break;
-      case 'payment.captured':
-        await handleRazorpayPaymentCaptured(event);
-        break;
-      case 'payment.failed':
-        await handleRazorpayPaymentFailed(event);
-        break;
-      case 'order.paid':
-        await handleRazorpayOrderPaid(event);
-        break;
-      case 'refund.created':
-        await handleRazorpayRefundCreated(event);
-        break;
-      case 'subscription.activated':
-        await handleRazorpaySubscriptionActivated(event);
-        break;
-      case 'subscription.charged':
-        await handleRazorpaySubscriptionCharged(event);
-        break;
-      case 'subscription.cancelled':
-        await handleRazorpaySubscriptionCancelled(event);
-        break;
-      case 'subscription.halted':
-        await handleRazorpaySubscriptionHalted(event);
-        break;
-      case 'subscription.completed':
-        await handleRazorpaySubscriptionCompleted(event);
-        break;
-      default:
-        console.log('Unhandled Razorpay event:', eventType);
+    if (eventType === "SUBSCRIPTION_ACTIVE" || eventType === "SUBSCRIPTION_PAYMENT_SUCCESS") {
+      await db.update(subscriptions).set({ status: "active", gatewayStatus: "active", updatedAt: new Date() }).where(eq(subscriptions.id, subscription.id));
+      const tx = await db.select().from(transactions).where(and(eq(transactions.subscriptionId, subscription.id), eq(transactions.status, "pending"))).limit(1);
+      if (tx.length > 0) {
+        await db.update(transactions).set({ status: "completed", paidAt: new Date() }).where(eq(transactions.id, tx[0].id));
+        await activateSubscriptionFromTransaction(tx[0], null, "cashfree");
+      }
+    } else if (eventType === "SUBSCRIPTION_CANCELLED") {
+      await db.update(subscriptions).set({ status: "cancelled", gatewayStatus: "cancelled", updatedAt: new Date() }).where(eq(subscriptions.id, subscription.id));
     }
 
-    res.status(200).json({ success: true, message: 'Webhook received' });
+    res.json({ status: "ok" });
   } catch (error) {
-    console.error('Razorpay webhook error:', error);
-    res.status(500).json({ success: false, message: 'Webhook processing failed', error });
+    console.error("Cashfree Webhook Error:", error);
+    res.status(500).send("Webhook Error");
   }
-};
+};;
 
 // Stripe Webhook Handler
 export const stripeWebhook = async (req: Request, res: Response) => {
@@ -2382,9 +2355,9 @@ export const stripeWebhook = async (req: Request, res: Response) => {
 
 // ==================== RAZORPAY HANDLERS ====================
 
-async function handleRazorpayPaymentAuthorized(event: any) {
+async function handleCashfreePaymentAuthorized(event: any) {
   const payment = event.payload.payment.entity;
-  console.log('Razorpay payment authorized:', payment.id);
+  console.log('Cashfree payment authorized:', payment.id);
 
   await updateTransactionByProviderOrderId(
     payment.order_id,
@@ -2400,9 +2373,9 @@ async function handleRazorpayPaymentAuthorized(event: any) {
   );
 }
 
-async function handleRazorpayPaymentCaptured(event: any) {
+async function handleCashfreePaymentCaptured(event: any) {
   const payment = event.payload.payment.entity;
-  console.log('Razorpay payment captured:', payment.id);
+  console.log('Cashfree payment captured:', payment.id);
 
   const transaction =
     (await findTransactionByProviderOrderId(payment.order_id)) ||
@@ -2426,13 +2399,13 @@ async function handleRazorpayPaymentCaptured(event: any) {
       })
       .where(eq(transactions.id, transaction.id));
 
-    await activateSubscriptionFromTransaction(transaction, null, "razorpay");
+    await activateSubscriptionFromTransaction(transaction, null, "cashfree");
   }
 }
 
-async function handleRazorpayPaymentFailed(event: any) {
+async function handleCashfreePaymentFailed(event: any) {
   const payment = event.payload.payment.entity;
-  console.log('Razorpay payment failed:', payment.id);
+  console.log('Cashfree payment failed:', payment.id);
 
   await updateTransactionByProviderOrderId(
     payment.order_id,
@@ -2448,9 +2421,9 @@ async function handleRazorpayPaymentFailed(event: any) {
   );
 }
 
-async function handleRazorpayOrderPaid(event: any) {
+async function handleCashfreeOrderPaid(event: any) {
   const order = event.payload.order.entity;
-  console.log('Razorpay order paid:', order.id);
+  console.log('Cashfree order paid:', order.id);
 
   await updateTransactionByProviderOrderId(
     order.id,
@@ -2461,9 +2434,9 @@ async function handleRazorpayOrderPaid(event: any) {
   );
 }
 
-async function handleRazorpayRefundCreated(event: any) {
+async function handleCashfreeRefundCreated(event: any) {
   const refund = event.payload.refund.entity;
-  console.log('Razorpay refund created:', refund.id);
+  console.log('Cashfree refund created:', refund.id);
 
   await updateTransactionByProviderPaymentId(
     refund.payment_id,
@@ -2478,9 +2451,9 @@ async function handleRazorpayRefundCreated(event: any) {
   );
 }
 
-async function handleRazorpaySubscriptionActivated(event: any) {
+async function handleCashfreeSubscriptionActivated(event: any) {
   const sub = event.payload.subscription.entity;
-  console.log('Razorpay subscription activated:', sub.id);
+  console.log('Cashfree subscription activated:', sub.id);
 
   const existingSub = await findSubscriptionByGatewayId(sub.id);
   if (existingSub) {
@@ -2491,14 +2464,14 @@ async function handleRazorpaySubscriptionActivated(event: any) {
         updatedAt: new Date()
       })
       .where(eq(subscriptions.id, existingSub.id));
-    console.log('Razorpay subscription activated in DB:', existingSub.id);
+    console.log('Cashfree subscription activated in DB:', existingSub.id);
   }
 }
 
-async function handleRazorpaySubscriptionCharged(event: any) {
+async function handleCashfreeSubscriptionCharged(event: any) {
   const sub = event.payload.subscription.entity;
   const payment = event.payload.payment?.entity;
-  console.log('Razorpay subscription charged:', sub.id, 'payment:', payment?.id);
+  console.log('Cashfree subscription charged:', sub.id, 'payment:', payment?.id);
 
   const existingSub = await findSubscriptionByGatewayId(sub.id);
   if (existingSub) {
@@ -2532,13 +2505,13 @@ async function handleRazorpaySubscriptionCharged(event: any) {
         updatedAt: new Date()
       })
       .where(eq(subscriptions.id, existingSub.id));
-    console.log('Razorpay subscription renewed in DB:', existingSub.id);
+    console.log('Cashfree subscription renewed in DB:', existingSub.id);
   }
 }
 
-async function handleRazorpaySubscriptionCancelled(event: any) {
+async function handleCashfreeSubscriptionCancelled(event: any) {
   const sub = event.payload.subscription.entity;
-  console.log('Razorpay subscription cancelled:', sub.id);
+  console.log('Cashfree subscription cancelled:', sub.id);
 
   const existingSub = await findSubscriptionByGatewayId(sub.id);
   if (existingSub) {
@@ -2550,13 +2523,13 @@ async function handleRazorpaySubscriptionCancelled(event: any) {
         updatedAt: new Date()
       })
       .where(eq(subscriptions.id, existingSub.id));
-    console.log('Razorpay subscription cancelled in DB:', existingSub.id);
+    console.log('Cashfree subscription cancelled in DB:', existingSub.id);
   }
 }
 
-async function handleRazorpaySubscriptionHalted(event: any) {
+async function handleCashfreeSubscriptionHalted(event: any) {
   const sub = event.payload.subscription.entity;
-  console.log('Razorpay subscription halted:', sub.id);
+  console.log('Cashfree subscription halted:', sub.id);
 
   const existingSub = await findSubscriptionByGatewayId(sub.id);
   if (existingSub) {
@@ -2571,9 +2544,9 @@ async function handleRazorpaySubscriptionHalted(event: any) {
   }
 }
 
-async function handleRazorpaySubscriptionCompleted(event: any) {
+async function handleCashfreeSubscriptionCompleted(event: any) {
   const sub = event.payload.subscription.entity;
-  console.log('Razorpay subscription completed:', sub.id);
+  console.log('Cashfree subscription completed:', sub.id);
 
   const existingSub = await findSubscriptionByGatewayId(sub.id);
   if (existingSub) {

@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { Request, Response } from "express";
 import { DiployError, asyncHandler as _dHandler, diployLogger, HTTP_STATUS } from "@diploy/core";
 import { db } from "../db";
@@ -22,14 +15,14 @@ import { subscriptions, users, plans, transactions } from "@shared/schema";
 import { eq, and, desc, lt, sql } from "drizzle-orm";
 import {
   cancelStripeSubscription,
-  cancelRazorpaySubscription,
+  cancelCashfreeSubscription,
   cancelPayPalSubscription,
   cancelPaystackSubscription,
   cancelMercadoPagoSubscription,
   upgradeOrDowngradeStripe,
-  upgradeOrDowngradeRazorpay,
+  upgradeOrDowngradeCashfree,
   createStripeSubscription,
-  createRazorpaySubscription,
+  createCashfreeSubscription,
 } from "../services/payment-gateway.service";
 
 export const getAllSubscriptions = async (req: Request, res: Response) => {
@@ -424,8 +417,8 @@ export const cancelSubscription = async (req: Request, res: Response) => {
             sub.gatewaySubscriptionId,
             immediately === true
           );
-        } else if (sub.gatewayProvider === "razorpay") {
-          await cancelRazorpaySubscription(
+        } else if (sub.gatewayProvider === "cashfree") {
+          await cancelCashfreeSubscription(
             sub.gatewaySubscriptionId,
             immediately === true
           );
@@ -588,8 +581,8 @@ export const changePlan = async (req: Request, res: Response) => {
             message: "Plan changed successfully via Stripe",
             data: { subscriptionId: gatewayResult.subscriptionId },
           });
-        } else if (currentSub.gatewayProvider === "razorpay") {
-          gatewayResult = await upgradeOrDowngradeRazorpay(
+        } else if (currentSub.gatewayProvider === "cashfree") {
+          gatewayResult = await upgradeOrDowngradeCashfree(
             userId,
             currentSub.gatewaySubscriptionId,
             newPlanId,
@@ -629,7 +622,7 @@ export const changePlan = async (req: Request, res: Response) => {
             startDate,
             endDate,
             gatewaySubscriptionId: gatewayResult.subscriptionId,
-            gatewayProvider: "razorpay",
+            gatewayProvider: "cashfree",
             gatewayStatus: gatewayResult.status,
           });
 
@@ -640,7 +633,7 @@ export const changePlan = async (req: Request, res: Response) => {
 
           return res.status(200).json({
             success: true,
-            message: "Plan downgraded successfully via Razorpay.",
+            message: "Plan downgraded successfully via Cashfree.",
             data: {
               subscriptionId: gatewayResult.subscriptionId,
               shortUrl: gatewayResult.shortUrl,

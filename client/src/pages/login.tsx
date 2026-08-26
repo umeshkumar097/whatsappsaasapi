@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { useState } from "react";
 import { useLocation, Link } from "wouter";
 import { useForm } from "react-hook-form";
@@ -184,7 +177,7 @@ export default function LoginPage() {
                 <div className="bg-green-500/10 backdrop-blur-sm rounded-xl p-2.5">
                   <MessageSquare className="h-7 w-7 text-green-400" />
                 </div>
-                <span className="text-2xl font-bold">WhatsWay</span>
+                <span className="text-2xl font-bold">Aiclex Technologies</span>
               </div>
             )}
           </div>

@@ -1,0 +1,23 @@
+{
+  "/robots.txt/route": "/robots.txt",
+  "/sitemap.xml/route": "/sitemap.xml",
+  "/icon.png/route": "/icon.png",
+  "/apple-icon.png/route": "/apple-icon.png",
+  "/_not-found/page": "/_not-found",
+  "/contact/page": "/contact",
+  "/data-deletion/page": "/data-deletion",
+  "/about/page": "/about",
+  "/blog/page": "/blog",
+  "/[keyword]/page": "/[keyword]",
+  "/[keyword]/[city]/page": "/[keyword]/[city]",
+  "/guides/page": "/guides",
+  "/cookie-policy/page": "/cookie-policy",
+  "/blog/[slug]/page": "/blog/[slug]",
+  "/page": "/",
+  "/location/[city]/page": "/location/[city]",
+  "/privacy-policy/page": "/privacy-policy",
+  "/services/page": "/services",
+  "/locations/page": "/locations",
+  "/terms/page": "/terms",
+  "/guides/meta-business-verification/page": "/guides/meta-business-verification"
+}

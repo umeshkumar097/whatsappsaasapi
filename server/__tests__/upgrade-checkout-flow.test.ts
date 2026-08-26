@@ -49,11 +49,11 @@ vi.mock("../services/payment-gateway.service", async () => {
     CurrencyNotSupportedError: actual.CurrencyNotSupportedError,
     assertProviderSupportsCurrency: actual.assertProviderSupportsCurrency,
     getStripe: vi.fn(),
-    getRazorpay: vi.fn(),
+    getCashfree: vi.fn(),
     createStripeSubscription: vi.fn(),
-    createRazorpaySubscription: vi.fn(),
+    createCashfreeSubscription: vi.fn(),
     getStripePublishableKey: vi.fn(),
-    getRazorpayKeyId: vi.fn(),
+    getCashfreeKeyId: vi.fn(),
     createPayPalSubscription: vi.fn(),
     getPayPalPublicClientId: vi.fn(),
     createPaystackSubscription: vi.fn(),
@@ -149,8 +149,8 @@ describe("Upgrade modal — operator-configured gateways per currency", () => {
       },
       {
         id: "p-razor",
-        name: "Razorpay",
-        providerKey: "razorpay",
+        name: "Cashfree",
+        providerKey: "cashfree",
         isActive: true,
         supportedCurrencies: ["INR"],
         supportedMethods: [],
@@ -176,7 +176,7 @@ describe("Upgrade modal — operator-configured gateways per currency", () => {
     expect(availableCurrencies).toEqual(["EUR", "INR", "USD"]);
     expect(currencyMap.USD.map((p: any) => p.providerKey)).toEqual(["stripe"]);
     expect(currencyMap.EUR.map((p: any) => p.providerKey)).toEqual(["stripe"]);
-    expect(currencyMap.INR.map((p: any) => p.providerKey)).toEqual(["razorpay"]);
+    expect(currencyMap.INR.map((p: any) => p.providerKey)).toEqual(["cashfree"]);
     // Paystack has no operator-configured currency, so it must not appear
     // under any currency bucket the modal offers.
     for (const code of Object.keys(currencyMap)) {
@@ -227,9 +227,9 @@ describe("POST /api/transactions — unsupported currency", () => {
 });
 
 describe("POST /api/payment/initiate — unsupported currency", () => {
-  it("returns 400 when createRazorpaySubscription rejects with CurrencyNotSupportedError", async () => {
+  it("returns 400 when createCashfreeSubscription rejects with CurrencyNotSupportedError", async () => {
     enqueue([{ id: "plan-1", monthlyPrice: "10.00", annualPrice: "100.00" }]);
-    enqueue([{ id: "prov-razor", providerKey: "razorpay", isActive: true, supportedCurrencies: ["INR"], name: "Razorpay" }]);
+    enqueue([{ id: "prov-razor", providerKey: "cashfree", isActive: true, supportedCurrencies: ["INR"], name: "Cashfree" }]);
 
     const res = await request(app).post("/api/payment/initiate").send({
       userId: "u-1",

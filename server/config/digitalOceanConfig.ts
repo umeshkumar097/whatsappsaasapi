@@ -51,10 +51,12 @@ export const createDOClient = async (): Promise<DOClientResult> => {
     let cleanEndpoint = config.endpoint.trim();
     cleanEndpoint = cleanEndpoint.replace(/\/$/, "");
 
+    const isR2 = cleanEndpoint.includes("cloudflarestorage.com");
+
     const urlParts = new URL(cleanEndpoint);
     const hostParts = urlParts.host.split(".");
 
-    if (hostParts.length > 3) {
+    if (!isR2 && hostParts.length > 3) {
       hostParts.shift();
       urlParts.host = hostParts.join(".");
       cleanEndpoint = urlParts.toString();
@@ -70,12 +72,12 @@ export const createDOClient = async (): Promise<DOClientResult> => {
 
     const s3Client = new S3Client({
       endpoint: cleanEndpoint,
-      region: config.region,
+      region: config.region || "auto",
       credentials: {
         accessKeyId: config.accessKey,
         secretAccessKey: config.secretKey,
       },
-      forcePathStyle: false,
+      forcePathStyle: isR2 ? true : false,
     });
 
     console.log("✅ S3 Client created successfully");

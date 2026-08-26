@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { sql } from "drizzle-orm";
 import { DIPLOY_BRAND } from "@diploy/core";
 import {
@@ -24,6 +17,7 @@ import {
   timestamp,
   integer,
   boolean,
+  decimal,
   jsonb,
   index,
   unique,
@@ -256,6 +250,7 @@ export const channels = pgTable("channels", {
   appId: text("app_id"),
   isActive: boolean("is_active").default(true),
   isCoexistence: boolean("is_coexistence").default(false),
+  gupshupAppId: text("gupshup_app_id"),
   // Health status fields
   healthStatus: text("health_status").default("unknown"), // healthy, warning, error, unknown
   lastHealthCheck: timestamp("last_health_check", { withTimezone: true }),
@@ -647,6 +642,8 @@ export const plans = pgTable("plans", {
   paystackPlanCodeAnnual: varchar("paystack_plan_code_annual"),
   mercadopagoPlanIdMonthly: varchar("mercadopago_plan_id_monthly"),
   mercadopagoPlanIdAnnual: varchar("mercadopago_plan_id_annual"),
+  cashfreePlanIdMonthly: varchar("cashfree_plan_id_monthly"),
+  cashfreePlanIdAnnual: varchar("cashfree_plan_id_annual"),
 
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
@@ -1897,3 +1894,39 @@ export const platformLanguages = pgTable("platform_languages", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
+
+// ====== WALLET & BILLING TABLES (GUPSHUP INTEGRATION) ======
+
+export const wallets = pgTable("wallets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`), 
+  userId: varchar("user_id").notNull(),
+  balance: decimal("balance", { precision: 12, scale: 4 }).notNull().default("0"),
+  currency: varchar("currency", { length: 10 }).notNull().default("INR"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+export const walletTransactions = pgTable("wallet_transactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`), 
+  walletId: varchar("wallet_id").notNull().references(() => wallets.id),
+  amount: decimal("amount", { precision: 12, scale: 4 }).notNull(),
+  type: varchar("type", { length: 20 }).notNull(),
+  description: text("description"),
+  status: varchar("status", { length: 20 }).notNull().default("completed"),
+  orderId: varchar("order_id", { length: 100 }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+export const messageRates = pgTable("message_rates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`), 
+  category: varchar("category", { length: 50 }).notNull().unique(),
+  price: decimal("price", { precision: 12, scale: 4 }).notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+export type Wallet = typeof wallets.$inferSelect;
+export type InsertWallet = typeof wallets.$inferInsert;
+export type WalletTransaction = typeof walletTransactions.$inferSelect;
+export type InsertWalletTransaction = typeof walletTransactions.$inferInsert;
+export type MessageRate = typeof messageRates.$inferSelect;
+export type InsertMessageRate = typeof messageRates.$inferInsert;

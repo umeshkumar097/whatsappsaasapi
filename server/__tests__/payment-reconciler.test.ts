@@ -93,7 +93,7 @@ vi.mock("../services/payment-gateway.service", () => ({
   getStripe: vi.fn(async () => ({
     paymentIntents: { retrieve: stripeRetrieveMock },
   })),
-  getRazorpay: vi.fn(async () => null),
+  getCashfree: vi.fn(async () => null),
   getPayPalAccessToken: vi.fn(async () => "ppl-token"),
   getPayPalBaseUrl: vi.fn(async () => "https://api-m.sandbox.paypal.com"),
   getPaystackSecretKey: vi.fn(async () => "sk_test_x"),

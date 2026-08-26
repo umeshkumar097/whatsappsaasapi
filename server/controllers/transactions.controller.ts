@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { Request, Response } from "express";
 import { DiployError, asyncHandler as _dHandler, diployLogger, HTTP_STATUS } from "@diploy/core";
 import { db } from "../db";
@@ -30,11 +23,11 @@ import crypto from "crypto";
 import ExcelJS from "exceljs";
 import {
   getStripe,
-  getRazorpay,
+  getCashfree,
   createStripeSubscription,
-  createRazorpaySubscription,
+  createCashfreeSubscription,
   getStripePublishableKey,
-  getRazorpayKeyId,
+  getCashfreeKeyId,
   createPayPalSubscription,
   getPayPalPublicClientId,
   createPaystackSubscription,
@@ -788,8 +781,8 @@ export const initiatePayment = async (req: Request, res: Response) => {
         publishableKey,
         gatewayStatus: result.status,
       };
-    } else if (provider.providerKey === "razorpay") {
-      const result = await createRazorpaySubscription(userId, planId, cycle, requestedCurrency);
+    } else if (provider.providerKey === "cashfree") {
+      const result = await createCashfreeSubscription(userId, planId, cycle, requestedCurrency);
 
       await db
         .update(transactions)
@@ -799,7 +792,7 @@ export const initiatePayment = async (req: Request, res: Response) => {
         })
         .where(eq(transactions.id, transaction.id));
 
-      const keyId = await getRazorpayKeyId();
+      const keyId = await getCashfreeKeyId();
 
       paymentData = {
         subscriptionId: result.subscriptionId,
@@ -888,25 +881,25 @@ export const initiatePayment = async (req: Request, res: Response) => {
   }
 };
 
-export const verifyRazorpayPayment = async (req: Request, res: Response) => {
+export const verifyCashfreePayment = async (req: Request, res: Response) => {
   try {
     const {
-      razorpay_subscription_id,
-      razorpay_payment_id,
-      razorpay_signature,
+      cashfree_subscription_id,
+      cashfree_payment_id,
+      cashfree_signature,
       transactionId,
     } = req.body;
 
     const providerData = await db
       .select()
       .from(paymentProviders)
-      .where(eq(paymentProviders.providerKey, "razorpay"))
+      .where(eq(paymentProviders.providerKey, "cashfree"))
       .limit(1);
 
     if (providerData.length === 0) {
       return res
         .status(404)
-        .json({ success: false, message: "Razorpay provider not found" });
+        .json({ success: false, message: "Cashfree provider not found" });
     }
 
     const provider = providerData[0];
@@ -919,7 +912,7 @@ export const verifyRazorpayPayment = async (req: Request, res: Response) => {
 
     const generated_signature = crypto
       .createHmac("sha256", secret)
-      .update(razorpay_payment_id + "|" + razorpay_subscription_id)
+      .update(cashfree_payment_id + "|" + cashfree_subscription_id)
       .digest("hex");
 
 
@@ -927,10 +920,10 @@ export const verifyRazorpayPayment = async (req: Request, res: Response) => {
 
     console.log("RAZORPAY DEBUG", {
       secret,
-      payload: razorpay_payment_id + "|" + razorpay_subscription_id,
+      payload: cashfree_payment_id + "|" + cashfree_subscription_id,
       generated_signature,
-      razorpay_signature,
-      matched: generated_signature === razorpay_signature,
+      cashfree_signature,
+      matched: generated_signature === cashfree_signature,
     });
 
 
@@ -950,7 +943,7 @@ export const verifyRazorpayPayment = async (req: Request, res: Response) => {
 
     const transaction = transactionData[0];
 
-    if (generated_signature !== razorpay_signature) {
+    if (generated_signature !== cashfree_signature) {
       await db
         .update(transactions)
         .set({
@@ -970,8 +963,8 @@ export const verifyRazorpayPayment = async (req: Request, res: Response) => {
       .update(transactions)
       .set({
         status: "completed",
-        providerOrderId: razorpay_subscription_id,
-        providerPaymentId: razorpay_payment_id,
+        providerOrderId: cashfree_subscription_id,
+        providerPaymentId: cashfree_payment_id,
         paidAt: new Date(),
         metadata: { verified: true },
         updatedAt: new Date(),
@@ -1031,8 +1024,8 @@ export const verifyRazorpayPayment = async (req: Request, res: Response) => {
         endDate,
         autoRenew: true,
         currency: transaction.currency || "INR",
-        gatewaySubscriptionId: razorpay_subscription_id,
-        gatewayProvider: "razorpay",
+        gatewaySubscriptionId: cashfree_subscription_id,
+        gatewayProvider: "cashfree",
         gatewayStatus: "active",
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -1059,12 +1052,12 @@ export const verifyRazorpayPayment = async (req: Request, res: Response) => {
       data: {
         transactionId,
         subscription: newSubscription[0],
-        subscriptionId: razorpay_subscription_id,
-        paymentId: razorpay_payment_id,
+        subscriptionId: cashfree_subscription_id,
+        paymentId: cashfree_payment_id,
       },
     });
   } catch (error) {
-    console.error("Error verifying Razorpay payment:", error);
+    console.error("Error verifying Cashfree payment:", error);
     res
       .status(500)
       .json({ success: false, message: "Error verifying payment", error });

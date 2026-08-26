@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import * as cron from 'node-cron';
 import axios from 'axios';
 import { db } from '../db';
@@ -22,7 +15,7 @@ import { transactions, paymentProviders } from '@shared/schema';
 import { sql, eq } from 'drizzle-orm';
 import {
   getStripe,
-  getRazorpay,
+  getCashfree,
   getPayPalAccessToken,
   getPayPalBaseUrl,
   getPaystackSecretKey,
@@ -162,8 +155,8 @@ export async function lookupPaymentStatus(
   switch (providerKey) {
     case 'stripe':
       return lookupStripe(tx);
-    case 'razorpay':
-      return lookupRazorpay(tx);
+    case 'cashfree':
+      return lookupCashfree(tx);
     case 'paypal':
       return lookupPayPal(tx);
     case 'paystack':
@@ -233,12 +226,12 @@ async function lookupStripe(tx: any): Promise<ReconcileLookupResult> {
   }
 }
 
-async function lookupRazorpay(tx: any): Promise<ReconcileLookupResult> {
+async function lookupCashfree(tx: any): Promise<ReconcileLookupResult> {
   const orderId: string | null = tx.providerOrderId;
   if (!orderId) return 'not_found';
-  const razorpay = await getRazorpay();
-  if (!razorpay) throw new Error('Razorpay is not configured');
-  const order: any = await razorpay.orders.fetch(orderId);
+  const cashfree = await getCashfree();
+  if (!cashfree) throw new Error('Cashfree is not configured');
+  const order: any = await cashfree.orders.fetch(orderId);
   switch (order.status) {
     case 'paid':
       return 'succeeded';

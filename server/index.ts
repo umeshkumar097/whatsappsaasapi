@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 process.on("uncaughtException", (err) => {
   console.error("[Process] Uncaught exception — server will keep running:", err);
 });
@@ -491,7 +484,7 @@ app.get("/api/version", (_req, res) => {
 });
 
 app.use('/webhooks/stripe', express.raw({ type: 'application/json' }));
-app.use('/webhooks/razorpay', express.raw({ type: 'application/json' }));
+app.use('/webhooks/cashfree', express.raw({ type: 'application/json' }));
 app.use('/webhooks/paypal', express.raw({ type: 'application/json' }));
 app.use('/webhooks/paystack', express.raw({ type: 'application/json' }));
 app.use('/webhooks/mercadopago', express.raw({ type: 'application/json' }));

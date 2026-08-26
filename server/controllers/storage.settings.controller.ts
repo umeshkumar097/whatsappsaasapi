@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { Request, Response } from "express";
 import { DiployError, asyncHandler as _dHandler, diployLogger, HTTP_STATUS } from "@diploy/core";
 import { db } from "../db";
@@ -119,9 +112,12 @@ export const testStorageConnection = async (req: Request, res: Response) => {
     if (!/^https?:\/\//i.test(cleanEndpoint)) {
       cleanEndpoint = `https://${cleanEndpoint}`;
     }
+
+    const isR2 = cleanEndpoint.includes("cloudflarestorage.com");
     const urlParts = new URL(cleanEndpoint);
     const hostParts = urlParts.host.split('.');
-    if (hostParts.length > 3) {
+
+    if (!isR2 && hostParts.length > 3) {
       hostParts.shift();
       urlParts.host = hostParts.join('.');
       cleanEndpoint = urlParts.toString();
@@ -129,12 +125,12 @@ export const testStorageConnection = async (req: Request, res: Response) => {
 
     const s3Client = new S3Client({
       endpoint: cleanEndpoint,
-      region: config.region,
+      region: config.region || "auto",
       credentials: {
         accessKeyId: config.accessKey,
         secretAccessKey: config.secretKey,
       },
-      forcePathStyle: false,
+      forcePathStyle: isR2 ? true : false,
     });
 
     try {

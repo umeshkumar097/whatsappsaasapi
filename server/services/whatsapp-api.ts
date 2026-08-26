@@ -1,21 +1,18 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
+import type { Channel } from "../../shared/schema";
+import { db } from "../db";
+import { wallets, walletTransactions, messageRates } from "../../shared/schema";
+import { eq } from "drizzle-orm";
 
-import type { Channel } from "@shared/schema";
 import { diployLogger, HTTP_STATUS, DIPLOY_BRAND } from "@diploy/core";
 import * as fs from "fs";
 import path from "path";
@@ -40,6 +37,39 @@ interface WhatsAppTemplate {
 }
 
 export class WhatsAppApiService {
+
+  async checkWalletAndDeduct(userId: string, category: string = "MARKETING"): Promise<void> {
+    let rate = await db.query.messageRates.findFirst({ where: eq(messageRates.category, category) });
+    const cost = rate ? parseFloat(rate.price) : 0.8;
+
+    let wallet = await db.query.wallets.findFirst({ where: eq(wallets.userId, userId) });
+    if (!wallet) {
+      throw new Error("Wallet not found. Please recharge to send messages.");
+    }
+    
+    const balance = parseFloat(wallet.balance);
+    if (balance < cost) {
+      throw new Error("Insufficient wallet balance. Please recharge to continue sending messages.");
+    }
+
+    const newBalance = (balance - cost).toFixed(4);
+    await db.update(wallets).set({ balance: newBalance }).where(eq(wallets.id, wallet.id));
+    
+    await db.insert(walletTransactions).values({
+      walletId: wallet.id,
+      amount: (-cost).toString(),
+      type: "DEBIT",
+      description: `WhatsApp ${category} Message`
+    });
+
+    // If balance hits zero or near zero, sync Gupshup credit line to 0 immediately (non-blocking)
+    if (parseFloat(newBalance) < 1) {
+      import("../controllers/wallet.controller").then(({ syncGupshupCreditLine }) => {
+        syncGupshupCreditLine(userId, parseFloat(newBalance)).catch(() => {});
+      }).catch(() => {});
+    }
+  }
+
   private channel: Channel;
   private baseUrl: string;
   private headers: Record<string, string>;
@@ -138,6 +168,17 @@ static async fetchMessagingLimit(channel: Channel): Promise<{
     const apiVersion = process.env.WHATSAPP_API_VERSION || "v24.0";
     const baseUrl = `https://graph.facebook.com/${apiVersion}`;
     const formattedPhone = to.replace(/\D/g, "");
+
+    // [WALLET BILLING] Deduct per message cost from the channel owner's wallet
+    if (channel.createdBy) {
+      try {
+        const tempInstance = new WhatsAppApiService(channel);
+        const category = isMarketing ? "MARKETING" : "UTILITY";
+        await tempInstance.checkWalletAndDeduct(channel.createdBy, category);
+      } catch (err: any) {
+        throw new Error(err.message || "Wallet deduction failed");
+      }
+    }
 
     const body: any = {
       messaging_product: "whatsapp",
@@ -355,6 +396,7 @@ private static readonly TIER_CONCURRENCY: Record<string, number> = {
       body.message_send_ttl_seconds = String(templateData.message_send_ttl_seconds);
     }
 
+    console.log("🌐 Sending to WhatsApp API URL:", `${this.baseUrl}/${this.channel.whatsappBusinessAccountId}/message_templates`);
     console.log("🌐 Sending to WhatsApp API:", JSON.stringify(body, null, 2));
 
     const response = await fetch(
@@ -585,6 +627,11 @@ private static readonly TIER_CONCURRENCY: Record<string, number> = {
     if (!template) throw new Error("Template not found");
 
     const templateLanguage = template.language || "en_US";
+    // [GUPSHUP BILLING BLOCK]
+    if (this.channel.createdBy) {
+      await this.checkWalletAndDeduct(this.channel.createdBy, template.category || "MARKETING");
+    }
+
 
     const components: any[] = [];
 
@@ -1061,13 +1108,15 @@ private static readonly TIER_CONCURRENCY: Record<string, number> = {
       }
     );
 
-    const headerHandle = uploadBinaryRes.data.h;
-
-    console.log("Uploaded template media, header handle:", headerHandle);
-
-    if (!headerHandle) {
+    const headerHandleRaw = uploadBinaryRes.data.h;
+    if (!headerHandleRaw) {
       throw new Error("No header handle returned");
     }
+    
+    // Meta API sometimes returns multiple handles joined by newline
+    const headerHandle = typeof headerHandleRaw === 'string' ? headerHandleRaw.split('\n')[0].trim() : headerHandleRaw;
+
+    console.log("Uploaded template media, header handle:", headerHandle);
 
     return headerHandle; // ✅ "4::xxxx"
   }

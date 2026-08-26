@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { useState, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -88,6 +81,31 @@ declare global {
 }
 
 type ConnectionFlow = "choose" | "eligibility" | "success";
+
+// Animated checklist item for onboarding popup
+function OnboardingCheckItem({ label, sub, delay }: { label: string; sub: string; delay: number }) {
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setDone(true), 300 + delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+
+  return (
+    <div className={`flex items-center gap-3 p-2.5 rounded-lg transition-all duration-500 ${done ? "bg-green-50" : "bg-gray-50"}`}>
+      <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${done ? "bg-green-500" : "bg-gray-200"}`}>
+        {done ? (
+          <Check className="w-3.5 h-3.5 text-white" />
+        ) : (
+          <Loader2 className="w-3.5 h-3.5 text-gray-400 animate-spin" />
+        )}
+      </div>
+      <div>
+        <p className={`text-sm font-medium transition-colors ${done ? "text-green-800" : "text-gray-500"}`}>{label}</p>
+        <p className="text-xs text-gray-400">{sub}</p>
+      </div>
+    </div>
+  );
+}
 
 export function ChannelSettings() {
   const { t } = useTranslation();
@@ -427,8 +445,8 @@ export function ChannelSettings() {
     }
 
     const extras: any = coexistence
-      ? { setup: {}, featureType: "whatsapp_business_app_onboarding", sessionInfoVersion: "3" }
-      : { setup: {}, sessionInfoVersion: "3" };
+      ? { setup: { waba_options: { solution_id: "5419102261649272" } }, featureType: "whatsapp_business_app_onboarding", sessionInfoVersion: "3" }
+      : { setup: { waba_options: { solution_id: "5419102261649272" } }, sessionInfoVersion: "3" };
 
     window.FB.login(
       (response: any) => {
@@ -1426,85 +1444,105 @@ export function ChannelSettings() {
       </Dialog>
 
       {/* Post-Onboarding Success Guidance Dialog */}
+      {/* ── ONBOARDING CHECKLIST POPUP ───────────────────────────────── */}
       <Dialog open={showSuccessGuidance} onOpenChange={setShowSuccessGuidance}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-green-700">
-              <CheckCircle className="w-5 h-5" />
-              WhatsApp Connected!
-            </DialogTitle>
-            <DialogDescription>
+        <DialogContent className="sm:max-w-lg p-0 overflow-hidden rounded-2xl">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-green-600 to-emerald-500 px-6 py-5 text-white">
+            <div className="flex items-center gap-3 mb-1">
+              <div className="bg-white/20 rounded-full p-1.5">
+                <CheckCircle className="w-5 h-5" />
+              </div>
+              <DialogTitle className="text-white text-lg font-bold m-0">
+                WhatsApp Connected Successfully! 🎉
+              </DialogTitle>
+            </div>
+            <DialogDescription className="text-white/80 text-sm m-0">
               {lastConnectedCoexistence
-                ? "Your WhatsApp Business App number is now connected in coexistence mode."
-                : "Your WhatsApp number is now connected and ready to use."}
+                ? "Connected in coexistence mode — your number is active."
+                : "Your number is live and ready to send messages."}
             </DialogDescription>
-          </DialogHeader>
+          </div>
 
-          {lastConnectedCoexistence ? (
-            <div className="space-y-3 mt-2">
-              <p className="text-sm text-gray-700 font-medium">Important things to know:</p>
+          <div className="px-6 py-4 space-y-4">
+            {/* SETUP CHECKLIST */}
+            <div>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Setup Checklist — Completed Automatically
+              </p>
               <div className="space-y-2">
-                <div className="flex items-start gap-2.5 p-2.5 bg-blue-50 rounded-lg">
-                  <Clock className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-xs text-blue-800">
-                    <p className="font-medium">Open your app regularly</p>
-                    <p>Open WhatsApp Business App at least once every 14 days to keep the connection active.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2.5 p-2.5 bg-blue-50 rounded-lg">
-                  <RefreshCw className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-xs text-blue-800">
-                    <p className="font-medium">Chat history syncing</p>
-                    <p>Your existing chats (up to 180 days) will sync within 24 hours. Media files are not included in the sync.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2.5 p-2.5 bg-blue-50 rounded-lg">
-                  <Smartphone className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-xs text-blue-800">
-                    <p className="font-medium">Re-link companion devices</p>
-                    <p>Companion devices were unlinked during setup. Re-link them now (note: Windows and WearOS are not supported).</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2.5 p-2.5 bg-amber-50 rounded-lg">
-                  <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-xs text-amber-800">
-                    <p className="font-medium">Limitations</p>
-                    <p>View-once media is disabled. Do not uninstall the WhatsApp Business App — this will break the connection.</p>
-                  </div>
-                </div>
+                {[
+                  { label: "WhatsApp Channel Connected", sub: "Your number is verified and active" },
+                  { label: "Webhook Subscribed", sub: "Real-time message delivery enabled" },
+                  { label: "Gupshup Partner Linked", sub: "Platform billing system connected" },
+                  { label: "Credit Line Allocated", sub: "Message sending credits assigned" },
+                ].map((item, i) => (
+                  <OnboardingCheckItem key={i} label={item.label} sub={item.sub} delay={i * 400} />
+                ))}
               </div>
             </div>
-          ) : (
-            <div className="space-y-3 mt-2">
-              <p className="text-sm text-gray-700">Your channel is ready! You can now:</p>
+
+            {/* NEXT STEPS */}
+            <div>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Next Steps — Complete These to Start Sending
+              </p>
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Check className="w-4 h-4 text-green-500" />
-                  <span>Send and receive messages through the platform</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Check className="w-4 h-4 text-green-500" />
-                  <span>Create and send template messages</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Check className="w-4 h-4 text-green-500" />
-                  <span>Set up automation workflows</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Check className="w-4 h-4 text-green-500" />
-                  <span>Launch bulk messaging campaigns</span>
-                </div>
+                <a href="/wallet" onClick={() => setShowSuccessGuidance(false)}>
+                  <div className="flex items-center gap-3 p-3 border-2 border-dashed border-orange-200 bg-orange-50 rounded-lg hover:border-orange-400 transition-colors cursor-pointer">
+                    <div className="bg-orange-100 rounded-lg p-2 flex-shrink-0">
+                      <span className="text-orange-600 text-lg">💰</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-800">Add Wallet Balance</p>
+                      <p className="text-xs text-gray-500">Required to send messages — ₹0.80/message</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-orange-400 flex-shrink-0" />
+                  </div>
+                </a>
+                <a href="/templates" onClick={() => setShowSuccessGuidance(false)}>
+                  <div className="flex items-center gap-3 p-3 border border-gray-200 bg-gray-50 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors cursor-pointer">
+                    <div className="bg-blue-100 rounded-lg p-2 flex-shrink-0">
+                      <span className="text-blue-600 text-lg">📝</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-800">Create Message Template</p>
+                      <p className="text-xs text-gray-500">Required by Meta before sending campaigns</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  </div>
+                </a>
+                <a href="/campaigns" onClick={() => setShowSuccessGuidance(false)}>
+                  <div className="flex items-center gap-3 p-3 border border-gray-200 bg-gray-50 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors cursor-pointer">
+                    <div className="bg-green-100 rounded-lg p-2 flex-shrink-0">
+                      <span className="text-green-600 text-lg">🚀</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-800">Launch First Campaign</p>
+                      <p className="text-xs text-gray-500">Send bulk WhatsApp messages to your contacts</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  </div>
+                </a>
               </div>
             </div>
-          )}
 
-          <DialogFooter>
-            <Button onClick={() => setShowSuccessGuidance(false)} className="w-full">
-              Got it
+            {lastConnectedCoexistence && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-xs font-semibold text-amber-700 mb-1">⚠️ Coexistence Mode — Important</p>
+                <p className="text-xs text-amber-600">Open your WhatsApp Business App at least once every 14 days. Do not uninstall the app — it will break the connection.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="px-6 pb-5">
+            <Button onClick={() => setShowSuccessGuidance(false)} className="w-full bg-green-600 hover:bg-green-700">
+              Start Using Waki →
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
+      {/* ────────────────────────────────────────────────────────────── */}
 
       {/* Disconnect Confirmation Dialog */}
       <Dialog open={!!showDisconnectConfirm} onOpenChange={() => setShowDisconnectConfirm(null)}>

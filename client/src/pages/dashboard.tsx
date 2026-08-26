@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/header";
 import { Loading } from "@/components/ui/loading";
@@ -48,10 +41,105 @@ import { useState } from "react";
 import { User, LogOut, LogIn, Edit, PlusCircle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useLocation } from "wouter";
+import { Link } from "wouter";
 import { DashboardStarApiDataType } from "./types/type";
 import { useAuth } from "@/contexts/auth-context";
 import { apiRequest } from "@/lib/queryClient";
 import AdminStats from "@/components/AdminStats";
+import { Wallet, AlertTriangle, RefreshCw } from "lucide-react";
+
+// ── Wallet Balance Widget ──────────────────────────────────────────────────
+function WalletWidget() {
+  const { data: walletData, isLoading, refetch } = useQuery({
+    queryKey: ["/api/wallet"],
+    queryFn: async () => {
+      const res = await apiRequest("GET", "/api/wallet");
+      return await res.json();
+    },
+    refetchInterval: 30000, // auto refresh every 30s
+  });
+
+  const balance = walletData?.wallet?.balance ? parseFloat(walletData.wallet.balance) : 0;
+  const isLow = balance < 50;
+  const isEmpty = balance < 1;
+
+  return (
+    <div className="space-y-2">
+      {/* Low / Empty balance banner */}
+      {isEmpty && (
+        <div className="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3">
+          <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+          <div className="flex-1">
+            <span className="font-semibold">Wallet Empty!</span>
+            <span className="ml-2 text-sm">Your messages will NOT be sent. Please add funds immediately.</span>
+          </div>
+          <Link href="/wallet">
+            <button className="text-sm font-semibold bg-red-600 text-white px-3 py-1.5 rounded-md hover:bg-red-700">
+              Add Funds Now
+            </button>
+          </Link>
+        </div>
+      )}
+      {!isEmpty && isLow && (
+        <div className="flex items-center gap-3 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded-lg px-4 py-3">
+          <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+          <div className="flex-1">
+            <span className="font-semibold">Low Balance Warning!</span>
+            <span className="ml-2 text-sm">Only ₹{balance.toFixed(2)} left. Recharge soon to avoid disruption.</span>
+          </div>
+          <Link href="/wallet">
+            <button className="text-sm font-semibold bg-yellow-600 text-white px-3 py-1.5 rounded-md hover:bg-yellow-700">
+              Add Funds
+            </button>
+          </Link>
+        </div>
+      )}
+
+      {/* Wallet Card */}
+      <Card className="border-0 shadow-sm bg-gradient-to-r from-green-600 to-emerald-500 text-white">
+        <CardContent className="p-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 rounded-lg p-2">
+                <Wallet className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-white/80 text-sm font-medium">Available Wallet Balance</p>
+                {isLoading ? (
+                  <div className="h-8 w-24 bg-white/20 rounded animate-pulse mt-1" />
+                ) : (
+                  <p className="text-3xl font-bold">₹{balance.toFixed(2)}</p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => refetch()}
+                className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
+                title="Refresh balance"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </button>
+              <Link href="/wallet">
+                <button className="bg-white text-green-700 font-semibold text-sm px-4 py-2 rounded-lg hover:bg-white/90 transition-colors">
+                  + Add Funds
+                </button>
+              </Link>
+            </div>
+          </div>
+          <p className="text-white/70 text-xs mt-3">
+            {isEmpty
+              ? "⚠️ Messages will not be sent — wallet is empty"
+              : isLow
+              ? "⚠️ Low balance — recharge to keep campaigns running"
+              : "✅ Balance is sufficient for sending messages"}
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+// ──────────────────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -261,6 +349,9 @@ export default function Dashboard() {
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
         <AdminStats />
+
+        {/* WALLET BALANCE WIDGET - show for non-superadmin */}
+        {user?.role !== "superadmin" && <WalletWidget />}
 
         {user?.role !== "superadmin" && stats && (
           <>

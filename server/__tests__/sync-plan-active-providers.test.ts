@@ -40,12 +40,12 @@ beforeEach(() => {
 
 describe("syncPlanToAllGateways scopes to active providers", () => {
   it("only attempts the gateways listed as active and ignores inactive ones", async () => {
-    queryQueue.push([{ providerKey: "stripe" }, { providerKey: "razorpay" }]);
+    queryQueue.push([{ providerKey: "stripe" }, { providerKey: "cashfree" }]);
 
     const result = await svc.syncPlanToAllGateways("plan-x");
 
     const gateways = result.errors.map((e) => e.split(":")[0]);
-    expect(gateways).toEqual(["Stripe", "Razorpay"]);
+    expect(gateways).toEqual(["Stripe", "Cashfree"]);
     expect(gateways).not.toContain("PayPal");
     expect(gateways).not.toContain("Paystack");
     expect(gateways).not.toContain("Mercado Pago");
@@ -58,7 +58,7 @@ describe("syncPlanToAllGateways scopes to active providers", () => {
 
     expect(result.errors).toEqual([]);
     expect(result.stripe).toBeUndefined();
-    expect(result.razorpay).toBeUndefined();
+    expect(result.cashfree).toBeUndefined();
     expect(result.paypal).toBeUndefined();
     expect(result.paystack).toBeUndefined();
     expect(result.mercadopago).toBeUndefined();

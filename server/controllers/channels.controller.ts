@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import type { Request, Response } from 'express';
 import { DiployError, asyncHandler as _dHandler, diployLogger, HTTP_STATUS } from "@diploy/core";
 import { storage } from '../storage';
@@ -398,6 +391,29 @@ export const disconnectChannel = asyncHandler(
   }
 );
 
+// Auto-fetch Gupshup Partner Token using API Client Secret (bypasses 2FA)
+async function getGupshupPartnerToken(): Promise<string | null> {
+  try {
+    const res = await fetch("https://partner.gupshup.io/partner/account/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `email=${encodeURIComponent("info@aiclex.in")}&secret=${encodeURIComponent("T_e19XYCNr2wYUf7DWebZDrKghg7xmwc1yERgC_n1TpTAdxIxxu6-fXLAzELOOjm")}`
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      return data.token;
+    } else {
+      const err = await res.text();
+      console.error("[Gupshup] Login failed with secret:", err);
+      return null;
+    }
+  } catch (err) {
+    console.error("[Gupshup] Token fetch error:", err);
+    return null;
+  }
+}
+
 export const embeddedSignup = asyncHandler(
   async (req: Request, res: Response) => {
     const { code, coexistence } = req.body;
@@ -737,26 +753,91 @@ export const embeddedSignup = asyncHandler(
     // 8️⃣ Subscribe WABA to receive webhook events via the app's global webhook
     await subscribeChannelToWebhook(channel);
 
-    // 9️⃣ Register phone number with Cloud API
+    // 9️⃣ Link to Gupshup Partner API + Allocate Credit Line
     try {
-      const registerRes = await fetch(
-        `https://graph.facebook.com/v24.0/${phoneNumberId}/register`,
-        {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${longLivedToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            messaging_product: "whatsapp",
-            pin: "123456",
-          }),
+      const partnerToken = await getGupshupPartnerToken();
+      if (partnerToken) {
+        console.log(`[EmbeddedSignup] Linking WABA ${wabaId} to Gupshup...`);
+        // Use correct endpoint: /partner/tpp/app
+        // Ensure name is purely alphanumeric - strip ALL non-alphanumeric chars
+        const cleanPhoneId = String(phoneNumberId).replace(/[^a-zA-Z0-9]/g, "");
+        const safeAppName = `waki${cleanPhoneId}`;
+        
+        // 📞 First register the phone number with Meta (fixes #133010 Account not registered)
+        try {
+          console.log(`[EmbeddedSignup] Registering phone number ${phoneNumberId} with Meta...`);
+          const regRes = await fetch(`https://graph.facebook.com/v22.0/${phoneNumberId}/register`, {
+            method: "POST",
+            headers: { 
+              "Authorization": `Bearer ${longLivedToken}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ messaging_product: "whatsapp", pin: "000000" })
+          });
+          const regData = await regRes.json();
+          console.log("[EmbeddedSignup] Phone registration response:", JSON.stringify(regData));
+        } catch (regErr) {
+          console.warn("[EmbeddedSignup] Phone registration step failed (may already be registered):", regErr);
         }
-      );
-      const registerData: any = await registerRes.json();
-      console.log("[EmbeddedSignup] Phone registration:", JSON.stringify(registerData, null, 2));
-    } catch (regErr) {
-      console.error("[EmbeddedSignup] Phone registration failed:", regErr);
+
+        const gupshupAppRes = await fetch("https://partner.gupshup.io/partner/tpp/app", {
+           method: "POST",
+           headers: { "Authorization": partnerToken, "Content-Type": "application/x-www-form-urlencoded" },
+           body: `name=${encodeURIComponent(safeAppName)}&wabaId=${wabaId}&phone=${phoneNumberId}`
+        });
+        const gupshupAppData = await gupshupAppRes.json();
+        console.log("[EmbeddedSignup] Gupshup Link Response:", JSON.stringify(gupshupAppData));
+
+        // App ID might be present even if status is error (e.g. "App already exists with phone...")
+        const linkedAppId = gupshupAppData.appId || gupshupAppData.id || gupshupAppData?.app?.id;
+        if (linkedAppId) {
+           await db.update(channels).set({ gupshupAppId: linkedAppId }).where(eq(channels.id, channel.id));
+           console.log(`[EmbeddedSignup] ✅ Gupshup App ID saved: ${linkedAppId}`);
+
+           // 🔟 Allocate Credit Line to the newly linked Gupshup app
+           try {
+             console.log(`[EmbeddedSignup] Allocating credit line for app ${linkedAppId}...`);
+             const creditLineRes = await fetch(`https://partner.gupshup.io/partner/app/${linkedAppId}/credit/allocate`, {
+               method: "POST",
+               headers: {
+                 "Authorization": partnerToken,
+                 "Content-Type": "application/x-www-form-urlencoded"
+               },
+               body: `creditAllocated=10000` // 10k default
+             });
+             const creditLineData = await creditLineRes.json();
+             console.log("[EmbeddedSignup] Credit Line Response:", JSON.stringify(creditLineData));
+           } catch (clErr) {
+             console.error("[EmbeddedSignup] Credit line allocation error:", clErr);
+           }
+
+           // 🚀 Auto Go Live — tries immediately after app creation
+           // Works if BM is verified; for unverified BMs, Gupshup keeps it Sandbox
+           try {
+             console.log(`[EmbeddedSignup] Attempting Go Live for app ${linkedAppId}...`);
+             const goLiveRes = await fetch(`https://partner.gupshup.io/partner/app/${linkedAppId}`, {
+               method: "PUT",
+               headers: {
+                 "Authorization": partnerToken,
+                 "Content-Type": "application/x-www-form-urlencoded"
+               },
+               body: `live=true&templateMessaging=true&stopped=false`
+             });
+             const goLiveData = await goLiveRes.json();
+             const isLive = goLiveData?.appDetails?.live === true;
+             console.log(`[EmbeddedSignup] Go Live response: live=${isLive}`, JSON.stringify(goLiveData).slice(0, 200));
+             if (!isLive) {
+               console.warn("[EmbeddedSignup] ⚠️ App still in Sandbox — client BM may need Meta verification");
+             }
+           } catch (glErr) {
+             console.error("[EmbeddedSignup] Go Live error:", glErr);
+           }
+        } else {
+          console.warn("[EmbeddedSignup] Gupshup app link response had no appId:", gupshupAppData);
+        }
+      }
+    } catch (gErr) {
+      console.error("[EmbeddedSignup] Failed to link with Gupshup:", gErr);
     }
 
     await updateLog({

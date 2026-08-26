@@ -2133,7 +2133,7 @@
     "form": {
       "providerLabel": "Zahlungsanbieter *",
       "selectProvider": "Anbieter auswählen",
-      "razorpay": "Razorpay",
+      "cashfree": "Cashfree",
       "stripe": "Stripe",
       "environmentLabel": "Umgebungsmodus *",
       "testMode": "Testmodus",
@@ -2143,12 +2143,12 @@
       "testCredentials": "Test-Zugangsdaten",
       "liveCredentials": "Live-Zugangsdaten",
       "testApiKey": "Test-API-Schlüssel *",
-      "testApiKeyPlaceholderRazorpay": "rzp_test_xxxxxxxxxxxxx",
+      "testApiKeyPlaceholderCashfree": "rzp_test_xxxxxxxxxxxxx",
       "testApiKeyPlaceholderStripe": "pk_test_xxxxxxxxxxxxx",
       "testApiSecret": "Test-API-Secret *",
       "testApiSecretPlaceholder": "Test-Secret-Key eingeben",
       "liveApiKey": "Live-API-Schlüssel *",
-      "liveApiKeyPlaceholderRazorpay": "rzp_live_xxxxxxxxxxxxx",
+      "liveApiKeyPlaceholderCashfree": "rzp_live_xxxxxxxxxxxxx",
       "liveApiKeyPlaceholderStripe": "pk_live_xxxxxxxxxxxxx",
       "liveApiSecret": "Live-API-Secret *",
       "liveApiSecretPlaceholder": "Live-Secret-Key eingeben",
@@ -2158,12 +2158,12 @@
       "updateSettings": "Einstellungen aktualisieren",
       "saveSettings": "Einstellungen speichern"
     },
-    "razorpay": {
-      "title": "Razorpay-Konfiguration",
-      "description": "Holen Sie sich Ihre Razorpay-Zugangsdaten vom Razorpay-Dashboard. Sie benötigen sowohl Test- als auch Live-Zugangsdaten.",
+    "cashfree": {
+      "title": "Cashfree-Konfiguration",
+      "description": "Holen Sie sich Ihre Cashfree-Zugangsdaten vom Cashfree-Dashboard. Sie benötigen sowohl Test- als auch Live-Zugangsdaten.",
       "testKeyInfo": "Test-Schlüssel beginnen mit",
       "liveKeyInfo": "Live-Schlüssel beginnen mit",
-      "getKeys": "Razorpay API-Schlüssel erhalten →"
+      "getKeys": "Cashfree API-Schlüssel erhalten →"
     },
     "stripe": {
       "title": "Stripe-Konfiguration",

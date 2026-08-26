@@ -1,20 +1,13 @@
 /**
  * ============================================================
- * © 2025 Diploy — a brand of Bisht Technologies Private Limited
- * Original Author: BTPL Engineering Team
- * Website: https://diploy.in
- * Contact: cs@diploy.in
+ * © 2026 Aiclex Technologies
+ * Original Author: Aiclex Engineering Team
+ * Website: https://aiclex.in
+ * Contact: info@aiclex.in
  *
- * Distributed under the Envato / CodeCanyon License Agreement.
- * Licensed to the purchaser for use as defined by the
- * Envato Market (CodeCanyon) Regular or Extended License.
- *
- * You are NOT permitted to redistribute, resell, sublicense,
- * or share this source code, in whole or in part.
- * Respect the author's rights and Envato licensing terms.
+ * All rights reserved.
  * ============================================================
  */
-
 import {
   ArrowRight,
   MessageSquare,
@@ -65,7 +58,7 @@ export function WebhookFlowDiagram() {
           <div className="w-12 h-12 sm:w-16 sm:h-16 bg-orange-100 rounded-full flex items-center justify-center mb-2">
             <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600" />
           </div>
-          <p className="text-sm font-medium">WhatsWay receives</p>
+          <p className="text-sm font-medium">Aiclex Technologies receives</p>
           <p className="text-xs text-gray-500 mt-1">Updates inbox</p>
         </div>
       </div>
