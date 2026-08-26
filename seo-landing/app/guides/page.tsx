@@ -23,7 +23,7 @@ export default function GuidesIndex() {
   return (
     <>
       <Header />
-      <main style={{ minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", color: "#fff", backgroundColor: "#0a2a1a" }}>
+      <main style={{ paddingTop: "70px", minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", color: "#fff", backgroundColor: "#0a2a1a" }}>
         <section style={{ background: "linear-gradient(135deg, #0a2a1a, #064e3b, #0a2a1a)", padding: "64px 24px", textAlign: "center" }}>
           <h1 style={{ fontSize: "clamp(28px, 5vw, 48px)", fontWeight: 900, marginBottom: "16px" }}>
             WhatsApp <span style={{ color: "#25d366" }}>Marketing Guides</span>

@@ -70,7 +70,7 @@ export default function MetaVerificationGuide() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schemaData }} />
       <Header />
-      <main style={{ minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", color: "#fff", backgroundColor: "#0a2a1a" }}>
+      <main style={{ paddingTop: "70px", minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", color: "#fff", backgroundColor: "#0a2a1a" }}>
         <section style={{ background: "linear-gradient(135deg, #0a2a1a 0%, #064e3b 50%, #0a2a1a 100%)", padding: "80px 24px 60px", textAlign: "center" }}>
           <div style={{ maxWidth: "800px", margin: "0 auto" }}>
             <span style={{ display: "inline-block", background: "rgba(37,211,102,0.1)", border: "1px solid rgba(37,211,102,0.3)", borderRadius: "24px", padding: "6px 16px", marginBottom: "24px", color: "#25d366", fontSize: "14px", fontWeight: 600 }}>Step-by-Step Guide</span>
